@@ -1,5 +1,4 @@
-import { AnotherLayout } from '../components/Layout';
-
+import AnotherLayout from '../components/Layout/AnotherLayout/Content';
 import Dashboard from '../pages/Dashboard';
 import Chart from '../pages/Chart';
 import Task from '../pages/Task';
