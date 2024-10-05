@@ -1,4 +1,3 @@
-import AnotherLayout from '../components/Layout/AnotherLayout/Content';
 import Dashboard from '../pages/Dashboard';
 import Chart from '../pages/Chart';
 import Task from '../pages/Task';
@@ -17,7 +16,7 @@ const publicRoutes = [
     { path: '/chat', component: Chat },
     { path: '/email', component: Email },
     { path: '/setting', component: Setting },
-    { path: '/profile', component: Profile, layout: AnotherLayout },
+    { path: '/profile', component: Profile },
 
 ]
 
