@@ -1,9 +1,8 @@
 import React from 'react';
 import HeaderComponent from './Header';
 import Sidebar from './Sidebar';
+import ContentComponent from './Content';
 import { Layout } from 'antd';
-
-const { Content } = Layout;
 
 const DefaultLayout = ({ children }) => {
   return (
@@ -11,7 +10,11 @@ const DefaultLayout = ({ children }) => {
       <Sidebar />
       <Layout>
         <HeaderComponent />
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>{children}</Content>
+        <Layout style={{ marginLeft: 200 }}>
+          {' '}
+          Chỉ thêm margin cho content
+          <ContentComponent />
+        </Layout>
       </Layout>
     </Layout>
   );
