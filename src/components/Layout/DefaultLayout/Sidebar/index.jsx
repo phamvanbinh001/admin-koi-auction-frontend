@@ -1,5 +1,5 @@
 import { Menu } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome,
@@ -17,14 +17,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = () => {
-  const navigate = useNavigate();
-
   const items = [
     {
       key: '1',
       icon: <FontAwesomeIcon icon={faHome} />,
-      label: 'Dashboard',
-      onClick: () => navigate('/'),
+      label: <Link to="/">Dashboard</Link>, // Sử dụng Link
     },
     {
       key: 'sub1',
@@ -33,15 +30,18 @@ const Sidebar = () => {
       children: [
         {
           key: '2',
-          label: 'User',
-          icon: <FontAwesomeIcon icon={faUsers} />,
-          onClick: () => navigate('/'),
+          label: <Link to="/request">Request</Link>, // Sử dụng Link
+          icon: <FontAwesomeIcon icon={faListCheck} />,
         },
         {
           key: '3',
-          label: 'Charts',
+          label: <Link to="/user">User</Link>, // Sử dụng Link
+          icon: <FontAwesomeIcon icon={faUsers} />,
+        },
+        {
+          key: '4',
+          label: <Link to="/chart">Charts</Link>, // Sử dụng Link
           icon: <FontAwesomeIcon icon={faChartLine} />,
-          onClick: () => navigate('/chart'),
         },
       ],
     },
@@ -51,22 +51,19 @@ const Sidebar = () => {
       label: 'Services',
       children: [
         {
-          key: '4',
-          label: 'Chat',
-          icon: <FontAwesomeIcon icon={faCommentDots} />,
-          onClick: () => navigate('/chat'),
-        },
-        {
           key: '5',
-          label: 'Email',
-          icon: <FontAwesomeIcon icon={faEnvelope} />,
-          onClick: () => navigate('/email'),
+          label: <Link to="/chat">Chat</Link>, // Sử dụng Link
+          icon: <FontAwesomeIcon icon={faCommentDots} />,
         },
         {
           key: '6',
-          label: 'Blogs',
+          label: <Link to="/email">Email</Link>, // Sử dụng Link
+          icon: <FontAwesomeIcon icon={faEnvelope} />,
+        },
+        {
+          key: '7',
+          label: <Link to="/blog">Blogs</Link>, // Sử dụng Link
           icon: <FontAwesomeIcon icon={faBlog} />,
-          onClick: () => navigate('/'),
         },
       ],
     },
@@ -76,24 +73,21 @@ const Sidebar = () => {
       label: 'Settings',
       children: [
         {
-          key: '7',
-          label: 'Auction Rules',
+          key: '8',
+          label: <Link to="/rule">Rules</Link>, // Sử dụng Link
           icon: <FontAwesomeIcon icon={faScaleBalanced} />,
-          onClick: () => navigate('/'),
         },
         {
-          key: '8',
-          label: 'Auction Requirements',
+          key: '9',
+          label: <Link to="/requirement">Requirements</Link>, // Sử dụng Link
           icon: <FontAwesomeIcon icon={faFileContract} />,
-          onClick: () => navigate('/'),
         },
       ],
     },
     {
-      key: '9',
+      key: '10',
       icon: <FontAwesomeIcon icon={faSignOutAlt} />,
-      label: 'Logout',
-      onClick: () => navigate('/'),
+      label: <Link to="/">Logout</Link>, // Sử dụng Link
     },
   ];
 

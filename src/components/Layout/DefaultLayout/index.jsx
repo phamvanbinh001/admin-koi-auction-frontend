@@ -2,21 +2,17 @@ import React from 'react';
 import HeaderComponent from './Header';
 import Sidebar from './Sidebar';
 import ContentComponent from './Content';
-import { Layout } from 'antd';
 
-const DefaultLayout = ({ children }) => {
+const DefaultLayout = () => {
+  console.log('Rendering Default Layout');
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <div>
+      <HeaderComponent />
       <Sidebar />
-      <Layout>
-        <HeaderComponent />
-        <Layout style={{ marginLeft: 200 }}>
-          {' '}
-          Chỉ thêm margin cho content
-          <ContentComponent />
-        </Layout>
-      </Layout>
-    </Layout>
+      <div className="content">
+        <ContentComponent />
+      </div>
+    </div>
   );
 };
 
