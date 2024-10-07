@@ -1,5 +1,5 @@
 const Blog = () => {
-  return <h2>ĐAAY LÀ-------------------------- BLOG ĐCM CHÚNG MÀYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</h2>;
+  return <h2>Blog</h2>;
 };
 
 export default Blog;
