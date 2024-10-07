@@ -4,7 +4,6 @@ import Sidebar from './Sidebar';
 import ContentComponent from './Content';
 
 const DefaultLayout = () => {
-  console.log('Rendering Default Layout');
   return (
     <div>
       <HeaderComponent />
