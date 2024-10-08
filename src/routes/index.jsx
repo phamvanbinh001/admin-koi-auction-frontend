@@ -1,8 +1,10 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+
+import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
 import DefaultLayout from '../components/Layout/DefaultLayout';
 import AnotherLayout from '../components/Layout/AnotherLayout';
 
+import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
 import User from '../pages/User';
 import Setting from '../pages/Setting';
@@ -17,32 +19,53 @@ import Blog from '../pages/Blog';
 import Requirement from '../pages/Requirement';
 import Rule from '../pages/Rule';
 
+import { AuthProvider, useAuth } from '../auth/AuthProvider'; // Import AuthProvider
+
+// PrivateRoute để kiểm tra xác thực
+const PrivateRoute = ({ element }) => {
+  const { isAuthenticated } = useAuth(); // Hàm kiểm tra xác thực từ AuthProvider
+
+  return isAuthenticated ? element : <Navigate to="/login" />;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Unrequired-auth put here*/}
+      <Route path="/login" element={<Login />} />
+
+      {/* Require-auth put here*/}
       <Route element={<DefaultLayout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/user" element={<User />} />
-        <Route path="/setting" element={<Setting />} />
-        <Route path="/chart" element={<Chart />} />
-        <Route path="/task" element={<Task />} />
-        <Route path="/order" element={<Order />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/email" element={<Email />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/request" element={<Request />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/rule" element={<Rule />} />
-        <Route path="/requirement" element={<Requirement />} />
+        <Route path="/" element={<PrivateRoute element={<Dashboard />} />} />
+        <Route path="/user" element={<PrivateRoute element={<User />} />} />
+        <Route path="/setting" element={<PrivateRoute element={<Setting />} />} />
+        <Route path="/task" element={<PrivateRoute element={<Task />} />} />
+        <Route path="/order" element={<PrivateRoute element={<Order />} />} />
+        <Route path="/chat" element={<PrivateRoute element={<Chat />} />} />
+        <Route path="/email" element={<PrivateRoute element={<Email />} />} />
+        <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+        <Route path="/request" element={<PrivateRoute element={<Request />} />} />
+        <Route path="/blog" element={<PrivateRoute element={<Blog />} />} />
+        <Route path="/rule" element={<PrivateRoute element={<Rule />} />} />
+        <Route path="/requirement" element={<PrivateRoute element={<Requirement />} />} />
       </Route>
+
+      {/* Route cho layout khác */}
       <Route
         path="/another"
         element={
-          <AnotherLayout>
-            <div>Another Page Content</div>
-          </AnotherLayout>
+          <PrivateRoute
+            element={
+              <AnotherLayout>
+                <div>Another Page Content</div>
+              </AnotherLayout>
+            }
+          />
         }
       />
+
+      {/* Mặc định chuyển hướng đến login nếu không có route */}
+      <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
 };
