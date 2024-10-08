@@ -26,6 +26,15 @@ const PrivateRoute = ({ element }) => {
   return isAuthenticated ? element : <Navigate to="/login" />;
 };
 
+import { AuthProvider, useAuth } from '../auth/AuthProvider'; // Import AuthProvider
+
+// PrivateRoute để kiểm tra xác thực
+const PrivateRoute = ({ element }) => {
+  const { isAuthenticated } = useAuth(); // Hàm kiểm tra xác thực từ AuthProvider
+
+  return isAuthenticated ? element : <Navigate to="/login" />;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
