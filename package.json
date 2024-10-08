@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+=======
+>>>>>>> 2dcbb75 (fixing loi khong co defaultlayout)
     "antd": "^5.21.2",
     "axios": "^1.7.7",
     "date": "^2.0.5",

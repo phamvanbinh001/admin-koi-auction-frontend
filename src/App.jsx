@@ -4,6 +4,9 @@ import AppRoutes from './routes';
 import { AuthProvider } from './auth/AuthProvider'; // Đảm bảo rằng bạn đã import AuthProvider
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2dcbb75 (fixing loi khong co defaultlayout)
 function App() {
   return (
     <AuthProvider>
@@ -13,6 +16,7 @@ function App() {
     </AuthProvider>
   );
 }
+<<<<<<< HEAD
 =======
 return (
   <AuthProvider>
@@ -22,5 +26,7 @@ return (
   </AuthProvider>
 );
 >>>>>>> d77dfd8 (Resolve conflicts and move login from dashboard branch to authen branch)
+=======
+>>>>>>> 2dcbb75 (fixing loi khong co defaultlayout)
 
 export default App;
