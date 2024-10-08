@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
 import DefaultLayout from '../components/Layout/DefaultLayout';
 import AnotherLayout from '../components/Layout/AnotherLayout';
@@ -17,6 +18,7 @@ import Request from '../pages/Request';
 import Blog from '../pages/Blog';
 import Requirement from '../pages/Requirement';
 import Rule from '../pages/Rule';
+
 import { AuthProvider, useAuth } from '../auth/AuthProvider'; // Import AuthProvider
 
 // PrivateRoute để kiểm tra xác thực
