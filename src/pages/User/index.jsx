@@ -26,7 +26,7 @@ const User = () => {
           {
             headers: {
               Authorization:
-                'Bearer eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjEsInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODMzMzM2NSwiZXhwIjoxNzI4MzM5ODQ1fQ.1RcLWGZCZyFIRLT-oW7abUeu-Q_Vdb1tTXX0voNYVxcJo-W4muQQCsvilClPGlMV',
+                'Bearer eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjEsInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODM3MjM1MSwiZXhwIjoxNzI4Mzc4ODMxfQ.uJYy-uQwNFrLwmkzf2uMHkTOnKGZs59ETRlkMJJJVIhVVAAeEmFEPZ4gSo_3Tic8',
               accept: '*/*',
             },
           },
