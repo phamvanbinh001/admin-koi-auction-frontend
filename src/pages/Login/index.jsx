@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, notification } from 'antd';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import axios from 'axios';
 import './Login.css'; // Tùy chọn nếu bạn muốn thêm CSS riêng
-import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Sử dụng hook useNavigate
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -19,7 +19,7 @@ const Login = () => {
       // Kiểm tra xem token có tồn tại không
       if (response.data && response.data.token) {
         const token = response.data.token;
-        console.log('Token is :' + token);
+        console.log('Token: ' + token);
   
         // Lưu token (localStorage hoặc state quản lý)
         // localStorage.setItem('token', token);
@@ -48,21 +48,7 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Thiết lập axios để thêm token từ localStorage vào header
-  axios.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    },
-  );
+  };  
 
   return (
     <div className="login-container">
