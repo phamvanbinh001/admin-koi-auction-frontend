@@ -1,109 +1,201 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Card, Modal } from 'antd';
-import axios from 'axios';
+import { Table, Modal, Button, Space } from 'antd';
+import api from '../../auth/api'; // Import đúng đường dẫn API của bạn
 
 const RequestPage = () => {
-  const [requests, setRequests] = useState([]);
-  const [selectedFish, setSelectedFish] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [auctionRequests, setAuctionRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedKoi, setSelectedKoi] = useState(null);
+  const [selectedOwner, setSelectedOwner] = useState(null);
+  const [isKoiModalOpen, setIsKoiModalOpen] = useState(false);
+  const [isOwnerModalOpen, setIsOwnerModalOpen] = useState(false);
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [currentAuction, setCurrentAuction] = useState(null); // Để lưu phiên đấu giá hiện tại khi mở Action Modal
 
   useEffect(() => {
-    // Giả sử bạn có API để lấy danh sách yêu cầu đấu giá
-    axios
-      .get('https://jsonplaceholder.typicode.com/users')
-      .then((response) => {
-        setRequests(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching auction requests:', error);
-      });
+    // Fetch auction requests data
+    const fetchData = async () => {
+      try {
+        const response = await api.get('/auction/get-auction-requets');
+        setAuctionRequests(response.data);
+      } catch (error) {
+        console.error('Failed to fetch data', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  const handleApprove = (id) => {
-    // Xử lý logic duyệt yêu cầu đấu giá
-    console.log(`Duyệt yêu cầu: ${id}`);
+  const handleKoiClick = (koi) => {
+    setSelectedKoi(koi);
+    setIsKoiModalOpen(true);
   };
 
-  const handleReject = (id) => {
-    // Xử lý logic từ chối yêu cầu đấu giá
-    console.log(`Từ chối yêu cầu: ${id}`);
+  const handleOwnerClick = (owner) => {
+    setSelectedOwner(owner);
+    setIsOwnerModalOpen(true);
+  };
+
+  const handleActionClick = (auction) => {
+    setCurrentAuction(auction);
+    setIsActionModalOpen(true);
+  };
+
+  const handleApprove = () => {
+    // Gọi API để duyệt yêu cầu đấu giá
+    console.log('Approve auction', currentAuction);
+    setIsActionModalOpen(false); // Đóng modal sau khi thực hiện hành động
+  };
+
+  const handleReject = () => {
+    // Gọi API để từ chối yêu cầu đấu giá
+    console.log('Reject auction', currentAuction);
+    setIsActionModalOpen(false); // Đóng modal sau khi thực hiện hành động
   };
 
   const columns = [
     {
-      title: 'Tên cá',
-      dataIndex: 'fishName',
-      key: 'fishName',
+      title: 'ID of Koi',
+      dataIndex: 'auctionId',
+      key: 'auctionId',
+      render: (text, record) => (
+        <Button type="link" onClick={() => handleKoiClick(record)}>
+          {text}
+        </Button>
+      ),
     },
     {
-      title: 'Loại cá',
-      dataIndex: 'fishType',
-      key: 'fishType',
+      title: 'Variety',
+      dataIndex: 'variety',
+      key: 'variety',
     },
     {
-      title: 'Giá khởi điểm',
-      dataIndex: 'startingPrice',
-      key: 'startingPrice',
+      title: 'Starting Bid',
+      dataIndex: 'startingBid',
+      key: 'startingBid',
     },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: 'Estimated Value',
+      dataIndex: 'estimatedValue',
+      key: 'estimatedValue',
     },
     {
-      title: 'Hành động',
+      title: 'Buy Now Price',
+      dataIndex: 'buyNowPrice',
+      key: 'buyNowPrice',
+    },
+    {
+      title: 'Expected Auction Date',
+      dataIndex: 'expectedAuctionDate',
+      key: 'expectedAuctionDate',
+    },
+    {
+      title: 'Expected End Date',
+      dataIndex: 'expectedEndDate',
+      key: 'expectedEndDate',
+    },
+    {
+      title: 'Owner',
+      dataIndex: 'breederName',
+      key: 'breederName',
+      render: (text, record) => (
+        <Button type="link" onClick={() => handleOwnerClick(record)}>
+          {text}
+        </Button>
+      ),
+    },
+    {
+      title: 'Action',
       key: 'action',
       render: (text, record) => (
-        <span>
-          <Button
-            onClick={() => {
-              setSelectedFish(record);
-              setIsModalVisible(true);
-            }}
-          >
-            Chi tiết
+        <Space size="middle">
+          <Button type="primary" onClick={() => handleActionClick(record)}>
+            Approve/Reject
           </Button>
-          <Button type="primary" onClick={() => handleApprove(record.id)} style={{ marginLeft: 8 }}>
-            Duyệt
-          </Button>
-          <Button type="danger" onClick={() => handleReject(record.id)} style={{ marginLeft: 8 }}>
-            Từ chối
-          </Button>
-        </span>
+        </Space>
       ),
     },
   ];
 
   return (
-    <div>
-      <Card title="Danh sách yêu cầu đấu giá">
-        <Table dataSource={requests} columns={columns} rowKey="id" />
-      </Card>
+    <>
+      <Table columns={columns} dataSource={auctionRequests} loading={loading} rowKey="auctionId" />
 
-      {selectedFish && (
-        <Modal
-          title="Chi tiết yêu cầu"
-          visible={isModalVisible}
-          onCancel={() => setIsModalVisible(false)}
-          footer={null}
-        >
-          <p>
-            <strong>Tên cá:</strong> {selectedFish.fishName}
-          </p>
-          <p>
-            <strong>Loại cá:</strong> {selectedFish.fishType}
-          </p>
-          <p>
-            <strong>Giá khởi điểm:</strong> {selectedFish.startingPrice}
-          </p>
-          <p>
-            <strong>Mô tả:</strong> {selectedFish.description}
-          </p>
-          {/* Nếu có hình ảnh */}
-          <img src={selectedFish.imageUrl} alt={selectedFish.fishName} style={{ width: '100%' }} />
-        </Modal>
-      )}
-    </div>
+      {/* Koi Details Modal */}
+      <Modal title="Koi Details" open={isKoiModalOpen} onCancel={() => setIsKoiModalOpen(false)} footer={null}>
+        {selectedKoi && (
+          <div>
+            <p>
+              <strong>ID:</strong> {selectedKoi.auctionId}
+            </p>
+            <p>
+              <strong>Name:</strong> {selectedKoi.koiName}
+            </p>
+            <p>
+              <strong>Variety:</strong> {selectedKoi.variety}
+            </p>
+            <p>
+              <strong>Starting Bid:</strong> {selectedKoi.startingBid}
+            </p>
+            <p>
+              <strong>Estimated Value:</strong> {selectedKoi.estimatedValue}
+            </p>
+            <p>
+              <strong>Size:</strong> {selectedKoi.size}
+            </p>
+            <p>
+              <strong>Born In:</strong> {selectedKoi.bornIn}
+            </p>
+            <img src={selectedKoi.imageUrl} alt={selectedKoi.koiName} style={{ width: '100%' }} />
+          </div>
+        )}
+      </Modal>
+
+      {/* Owner Details Modal */}
+      <Modal title="Owner Details" open={isOwnerModalOpen} onCancel={() => setIsOwnerModalOpen(false)} footer={null}>
+        {selectedOwner && (
+          <div>
+            <p>
+              <strong>Breeder Name:</strong> {selectedOwner.breederName}
+            </p>
+            <p>
+              <strong>Other Details:</strong> More info can be added here...
+            </p>
+          </div>
+        )}
+      </Modal>
+
+      {/* Approve/Reject Action Modal */}
+      <Modal
+        title="Approve/Reject Auction"
+        open={isActionModalOpen}
+        onCancel={() => setIsActionModalOpen(false)}
+        footer={[
+          <Button key="reject" type="danger" onClick={handleReject}>
+            Reject
+          </Button>,
+          <Button key="approve" type="primary" onClick={handleApprove}>
+            Approve
+          </Button>,
+        ]}
+      >
+        {currentAuction && (
+          <div>
+            <p>
+              <strong>ID of Koi:</strong> {currentAuction.auctionId}
+            </p>
+            <p>
+              <strong>Variety:</strong> {currentAuction.variety}
+            </p>
+            <p>
+              <strong>Starting Bid:</strong> {currentAuction.startingBid}
+            </p>
+            <p>Do you want to approve or reject this auction request?</p>
+          </div>
+        )}
+      </Modal>
+    </>
   );
 };
 

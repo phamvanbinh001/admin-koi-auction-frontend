@@ -27,4 +27,4 @@ dist-ssr
 .env.*
 
 # mp4 files
-# .mp4
+*.mp4
