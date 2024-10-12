@@ -27,6 +27,10 @@ dist-ssr
 .env.*
 
 # mp4 files
+<<<<<<< HEAD
 *.mp4
 
 chat.html
+=======
+*.mp4
+>>>>>>> d9fc573 (Get Auction Feature before using tooltip)

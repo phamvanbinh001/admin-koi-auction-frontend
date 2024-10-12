@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import './index.scss';
 import { ConfigProvider } from 'antd';
 function GlobalStyles({ children }) {
@@ -12,6 +13,12 @@ function GlobalStyles({ children }) {
       {children}
     </ConfigProvider>
   );
+=======
+import './GlobalStyles.scss';
+
+function GlobalStyles({ children }) {
+  return children;
+>>>>>>> d9fc573 (Get Auction Feature before using tooltip)
 }
 
 export default GlobalStyles;
