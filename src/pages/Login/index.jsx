@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, notification } from 'antd';
-import axios from 'axios';
+import api from '../../auth/api';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
 import './Login.css';
@@ -13,10 +13,7 @@ const Login = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        'https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/api/security/login',
-        values,
-      );
+      const response = await api.post('/security/login', values);
 
       // Kiểm tra xem token có tồn tại không
       if (response.data && response.data.token) {
@@ -84,7 +81,7 @@ const Login = () => {
           </a>
         </div>
         <div className="login-banner">
-          <video src="src/assets/1234.mp4" autoPlay loop muted></video>
+          <video src="src/assets/videoLogin.mp4" autoPlay loop muted></video>
         </div>
       </div>
     </div>

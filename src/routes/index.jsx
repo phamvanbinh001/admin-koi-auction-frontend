@@ -8,14 +8,14 @@ import Dashboard from '../pages/Dashboard';
 import User from '../pages/User';
 import Setting from '../pages/Setting';
 import Chart from '../pages/Chart';
-import Task from '../pages/Task';
+import Auction from '../pages/Auction';
 import Order from '../pages/Order';
 import Chat from '../pages/Chat';
 import Email from '../pages/Email';
 import Profile from '../pages/Profile';
-import Request from '../pages/Request';
+import RequestPage from '../pages/Request';
 import Blog from '../pages/Blog';
-import Requirement from '../pages/Requirement';
+import Requirement from '../pages/Auction';
 import Rule from '../pages/Rule';
 import { AuthProvider, useAuth } from '../auth/AuthProvider'; // Import AuthProvider
 
@@ -42,12 +42,12 @@ const AppRoutes = () => {
         <Route path="/chart" element={<PrivateRoute element={<Chart />} />} />
         <Route path="/user" element={<PrivateRoute element={<User />} />} />
         <Route path="/setting" element={<PrivateRoute element={<Setting />} />} />
-        <Route path="/task" element={<PrivateRoute element={<Task />} />} />
+        <Route path="/auction" element={<PrivateRoute element={<Auction />} />} />
         <Route path="/order" element={<PrivateRoute element={<Order />} />} />
         <Route path="/chat" element={<PrivateRoute element={<Chat />} />} />
         <Route path="/email" element={<PrivateRoute element={<Email />} />} />
         <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
-        <Route path="/request" element={<PrivateRoute element={<Request />} />} />
+        <Route path="/request" element={<PrivateRoute element={<RequestPage />} />} />
         <Route path="/blog" element={<PrivateRoute element={<Blog />} />} />
         <Route path="/rule" element={<PrivateRoute element={<Rule />} />} />
         <Route path="/requirement" element={<PrivateRoute element={<Requirement />} />} />
