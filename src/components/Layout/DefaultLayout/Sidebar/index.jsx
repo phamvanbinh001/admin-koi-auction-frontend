@@ -13,7 +13,7 @@ import {
   faUsers,
   faBlog,
   faListCheck,
-  faScaleBalanced,
+  faWallet,
   faFileContract,
   faHandshakeSimple,
   faCommentDots,
@@ -43,16 +43,28 @@ const Sidebar = () => {
       children: [
         {
           key: '2',
-          label: <Link to="/request">Request</Link>,
+          label: <Link to="/request">Requests</Link>,
           icon: <FontAwesomeIcon icon={faListCheck} />,
         },
-        role === 'Admin' && {
+
+        {
           key: '3',
-          label: <Link to="/user">User</Link>,
+          label: <Link to="/auction">Auctions</Link>,
+          icon: <FontAwesomeIcon icon={faFileContract} />,
+        },
+        role === 'Admin' && {
+          key: '4',
+          label: <Link to="/transaction">Transactions</Link>,
+          icon: <FontAwesomeIcon icon={faWallet} />,
+        },
+        role === 'Admin' && {
+          key: '5',
+          label: <Link to="/user">Users</Link>,
           icon: <FontAwesomeIcon icon={faUsers} />,
         },
+
         {
-          key: '4',
+          key: '1000',
           label: <Link to="/chart">Charts</Link>,
           icon: <FontAwesomeIcon icon={faChartLine} />,
         },
@@ -64,38 +76,26 @@ const Sidebar = () => {
       label: 'Services',
       children: [
         {
-          key: '5',
+          key: '6',
           label: <Link to="/chat">Chat</Link>,
           icon: <FontAwesomeIcon icon={faCommentDots} />,
         },
         {
-          key: '6',
+          key: '7',
           label: <Link to="/email">Email</Link>,
           icon: <FontAwesomeIcon icon={faEnvelope} />,
         },
         {
-          key: '7',
+          key: '8',
           label: <Link to="/blog">Blogs</Link>,
           icon: <FontAwesomeIcon icon={faBlog} />,
         },
       ],
     },
     {
-      key: 'sub3',
+      key: '9',
       icon: <FontAwesomeIcon icon={faCogs} />,
-      label: 'Settings',
-      children: [
-        role === 'Admin' && {
-          key: '8',
-          label: <Link to="/rule">Rules</Link>,
-          icon: <FontAwesomeIcon icon={faScaleBalanced} />,
-        },
-        role === 'Admin' && {
-          key: '9',
-          label: <Link to="/requirement">Requirements</Link>,
-          icon: <FontAwesomeIcon icon={faFileContract} />,
-        },
-      ],
+      label: 'Setting',
     },
     {
       key: '10',

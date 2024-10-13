@@ -16,7 +16,7 @@ import Profile from '../pages/Profile';
 import RequestPage from '../pages/Request';
 import Blog from '../pages/Blog';
 import Requirement from '../pages/Auction';
-import Rule from '../pages/Rule';
+import Transaction from '../pages/Transaction';
 import { AuthProvider, useAuth } from '../auth/AuthProvider'; // Import AuthProvider
 
 // PrivateRoute để kiểm tra xác thực
@@ -49,7 +49,7 @@ const AppRoutes = () => {
         <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
         <Route path="/request" element={<PrivateRoute element={<RequestPage />} />} />
         <Route path="/blog" element={<PrivateRoute element={<Blog />} />} />
-        <Route path="/rule" element={<PrivateRoute element={<Rule />} />} />
+        <Route path="/transaction" element={<PrivateRoute element={<Transaction />} />} />
         <Route path="/requirement" element={<PrivateRoute element={<Requirement />} />} />
       </Route>
       {/* Route cho layout khác */}
