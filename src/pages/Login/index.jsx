@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, notification } from 'antd';
+import { Form, Divider, Input, Button, notification } from 'antd';
 import api from '../../auth/api';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
@@ -63,6 +63,9 @@ const Login = () => {
           </div>
           <h1>Sign In Now</h1>
           <p className="description">Enter your email address and password to access your account.</p>
+          <Divider orientation="left" plain style={{ color: 'gray' }}>
+            Manage system
+          </Divider>
           <Form name="login" onFinish={onFinish}>
             <Form.Item name="userName" rules={[{ required: true, message: 'Please input your username or email!' }]}>
               <Input placeholder="Enter email or username" />

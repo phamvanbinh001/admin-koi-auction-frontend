@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, Button } from 'antd';
+import { Table, Tag, Button, Flex } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import UserPopover from '../../components/Popover/UserPopover';
 import api from '../../auth/api';
 import * as XLSX from 'xlsx';
@@ -128,7 +129,7 @@ const Auction = () => {
           case 'Pending':
             color = 'orange';
             break;
-          case 'Finished':
+          case 'Reject':
             color = 'red';
             break;
           default:
@@ -140,17 +141,51 @@ const Auction = () => {
   ];
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(auctions); // Chuyển đổi dữ liệu đấu giá sang sheet
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Auctions');
-    XLSX.writeFile(workbook, 'auction_data.xlsx'); // Tạo file và xuất ra với tên "auction_data.xlsx"
-  };
+    // Kiểm tra xem auctions có dữ liệu hay không
+    if (!auctions || auctions.length === 0) {
+      console.error('No auction data available to export');
+      return;
+    }
 
+    const exportData = auctions.map((auctionItem) => ({
+      id: auctionItem.auction.id || 'N/A',
+      breederID: auctionItem.auction.breederID || 'N/A',
+      staffID: auctionItem.auction.staffID || 'N/A',
+      winnerID: auctionItem.auction.winnerID || 'N/A',
+      auctionMethod: auctionItem.auction.auctionMethod || 'N/A',
+      startTime: auctionItem.auction.startTime
+        ? format(new Date(auctionItem.auction.startTime), 'dd/MM/yyyy HH:mm:ss')
+        : 'N/A',
+      endTime: auctionItem.auction.endTime
+        ? format(new Date(auctionItem.auction.endTime), 'dd/MM/yyyy HH:mm:ss')
+        : 'N/A',
+      breederDeposit: auctionItem.auction.breederDeposit !== undefined ? auctionItem.auction.breederDeposit : 'N/A',
+      bidderDeposit: auctionItem.auction.bidderDeposit !== undefined ? auctionItem.auction.bidderDeposit : 'N/A',
+      startingPrice: auctionItem.auction.startingPrice !== undefined ? auctionItem.auction.startingPrice : 'N/A',
+      buyoutPrice: auctionItem.auction.buyoutPrice !== undefined ? auctionItem.auction.buyoutPrice : 'N/A',
+      finalPrice: auctionItem.auction.finalPrice !== undefined ? auctionItem.auction.finalPrice : 'N/A',
+      bidStep: auctionItem.auction.bidStep !== undefined ? auctionItem.auction.bidStep : 'N/A',
+      auctionFee: auctionItem.auction.auctionFee !== undefined ? auctionItem.auction.auctionFee : 'N/A',
+      createAt: auctionItem.auction.createAt
+        ? format(new Date(auctionItem.auction.createAt), 'dd/MM/yyyy HH:mm:ss')
+        : 'N/A',
+      status: auctionItem.auction.status || 'N/A',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData); // Tạo sheet từ dữ liệu
+    const workbook = XLSX.utils.book_new(); // Tạo workbook mới
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Auctions'); // Thêm sheet vào workbook
+    XLSX.writeFile(workbook, 'AuctionsData.xlsx'); // Xuất file Excel
+  };
   return (
     <>
-      <Button type="primary" onClick={exportToExcel} style={{ marginBottom: '20px' }}>
-        Export to Excel
-      </Button>
+      <Flex gap="small" align="flex-end" vertical onClick={exportToExcel} style={{ marginBottom: '20px' }}>
+        <Flex gap="small" wrap>
+          <Button type="primary" icon={<DownloadOutlined />} size={'middle'}>
+            Export to Excel
+          </Button>
+        </Flex>
+      </Flex>
       <Table columns={columns} dataSource={auctions} loading={loading} rowKey={(record) => record.auction.id} />
     </>
   );
