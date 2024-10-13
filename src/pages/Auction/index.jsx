@@ -12,7 +12,6 @@ const Auction = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch auction data
     const fetchData = async () => {
       try {
         const response = await api.get('/auction/get-all');
