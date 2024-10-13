@@ -1,0 +1,22 @@
+.post-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.post-author {
+  color: #888;
+}
+
+.post-time {
+  color: #888;
+}
+
+.post-details {
+  padding: 20px;
+  border: 1px solid #f0f0f0;
+  border-radius: 5px;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
