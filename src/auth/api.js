@@ -30,21 +30,21 @@ api.interceptors.request.use(
     },
 );
 
-api.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
-        if (error.response && error.response.status === 401) {
-            console.log(error.response.message);
-            console.error('Unauthorized!');
-            if (error.config.onUnauthorizedCallback) {
-                error.config.onUnauthorizedCallback();
-            }
-        }
-        return Promise.reject(error);
-    },
-);
+// api.interceptors.response.use(
+//     (response) => {
+//         return response;
+//     },
+//     (error) => {
+//         if (error.response && error.response.status === 401) {
+//             console.log(error.response.message);
+//             console.error('Unauthorized!');
+//             if (error.config.onUnauthorizedCallback) {
+//                 error.config.onUnauthorizedCallback();
+//             }
+//         }
+//         return Promise.reject(error);
+//     },
+// );
 
 export default api;
 
