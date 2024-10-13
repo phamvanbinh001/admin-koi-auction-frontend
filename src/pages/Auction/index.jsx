@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Tag, Button, Tooltip } from 'antd';
+import UserPopover from '../../components/Popover/UserPopover';
 import api from '../../auth/api';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
@@ -90,21 +91,14 @@ const Auction = () => {
     {
       title: 'Breeder',
       dataIndex: ['auction', 'breederID'],
-      render: (text) => (
-        <Tooltip title={`Breeder Name: ${text}`}>
-          <b style={{ color: 'blue' }}>Hover Here</b>
-        </Tooltip>
-      ),
+      render: (text) => <UserPopover userId={text} />,
     },
 
     {
       title: 'Approved By',
       dataIndex: ['auction', 'staffID'],
-      render: (text) => (
-        <Tooltip title={`Approved By Staff ID: ${text}`}>
-          <b style={{ color: 'blue' }}>Hover Here</b>
-        </Tooltip>
-      ),
+      key: 'staffID',
+      render: (text) => <UserPopover userId={text} />,
     },
 
     {
