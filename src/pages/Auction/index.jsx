@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, Button, Tooltip } from 'antd';
+import { Table, Tag, Button } from 'antd';
 import UserPopover from '../../components/Popover/UserPopover';
 import api from '../../auth/api';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
+import FishPopover from '../../components/Popover/FishPopover';
 
 const Auction = () => {
   const [auctions, setAuctions] = useState([]);
@@ -38,24 +39,36 @@ const Auction = () => {
     {
       title: 'Fish Details',
       key: 'koiFish',
-      render: (text, record) => (
-        <Tooltip title={`Koi Fish IDs: ${record.koiFish.join(', ')}`}>
-          <b style={{ color: 'blue' }}>Hover Here</b>
-        </Tooltip>
-      ),
+      render: (text, record) => {
+        return (
+          <>
+            <b>
+              {record.koiFish && record.koiFish.length > 0 ? (
+                <FishPopover fishIds={record.koiFish}>Click here</FishPopover>
+              ) : (
+                'No Fish Data'
+              )}
+            </b>
+          </>
+        );
+      },
     },
     {
       title: 'Start Time',
       dataIndex: ['auction', 'startTime'],
       render: (text, record) => {
-        return record.startTime ? format(new Date(record.startTime), 'dd/MM/yyyy HH:mm:ss') : 'N/A';
+        return record.auction && record.auction.startTime
+          ? format(new Date(record.auction.startTime), 'dd/MM/yyyy HH:mm:ss')
+          : 'N/A';
       },
     },
     {
       title: 'Estimated End Time',
       dataIndex: ['auction', 'endTime'],
       render: (text, record) => {
-        return record.startTime ? format(new Date(record.endTime), 'dd/MM/yyyy HH:mm:ss') : 'N/A';
+        return record.auction && record.auction.endTime
+          ? format(new Date(record.auction.endTime), 'dd/MM/yyyy HH:mm:ss')
+          : 'N/A';
       },
     },
     {
@@ -93,14 +106,12 @@ const Auction = () => {
       dataIndex: ['auction', 'breederID'],
       render: (text) => <UserPopover userId={text} />,
     },
-
     {
       title: 'Approved By',
       dataIndex: ['auction', 'staffID'],
       key: 'staffID',
       render: (text) => <UserPopover userId={text} />,
     },
-
     {
       title: 'Status',
       dataIndex: ['auction', 'status'],
