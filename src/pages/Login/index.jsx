@@ -4,6 +4,7 @@ import api from '../../auth/api';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
 import './Login.css';
+import Logo from '../../components/Logo';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -58,8 +59,8 @@ const Login = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="login-form">
-          <div className="login-logo">
-            <img src="/logo.png" alt="Logo" />
+          <div className="logo">
+            <Logo />
           </div>
           <h1>Sign In Now</h1>
           <p className="description">Enter your email address and password to access your account.</p>

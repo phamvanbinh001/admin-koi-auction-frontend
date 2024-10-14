@@ -1,9 +1,6 @@
-import { Menu } from 'antd';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Layout, Menu, Button } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { useAuth } from '../../../../auth/AuthProvider'; // Assuming this is where AuthProvider is
-
 import {
   faHome,
   faChartLine,
@@ -18,13 +15,18 @@ import {
   faHandshakeSimple,
   faCommentDots,
 } from '@fortawesome/free-solid-svg-icons';
+import { Link, useNavigate } from 'react-router-dom';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import styles from './index.module.scss';
+// import { useAuth } from './../../configs/AuthProvider';
 
-const Sidebar = () => {
-  const { logout } = useAuth();
+const { Sider } = Layout;
+
+const SidebarComponent = ({ collapsed, setCollapsed }) => {
+  // const { logout } = useAuth();
   const navigate = useNavigate();
   const role = localStorage.getItem('role');
 
-  // Handler for logout
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -46,7 +48,6 @@ const Sidebar = () => {
           label: <Link to="/request">Requests</Link>,
           icon: <FontAwesomeIcon icon={faListCheck} />,
         },
-
         {
           key: '3',
           label: <Link to="/auction">Auctions</Link>,
@@ -62,7 +63,6 @@ const Sidebar = () => {
           label: <Link to="/user">Users</Link>,
           icon: <FontAwesomeIcon icon={faUsers} />,
         },
-
         {
           key: '1000',
           label: <Link to="/chart">Charts</Link>,
@@ -106,12 +106,16 @@ const Sidebar = () => {
   ];
 
   return (
-    <Menu
-      mode="inline"
-      style={{ height: '100%', width: 200, position: 'fixed', left: 0, top: 64, borderRight: 0 }}
-      items={items}
-    />
+    <Sider collapsible collapsed={collapsed} trigger={null} width={200} className={styles.sider}>
+      <Button
+        type="text"
+        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        onClick={() => setCollapsed(!collapsed)}
+        className={styles.collapseButton}
+      />
+      <Menu mode="inline" className={styles.menu} items={items} />
+    </Sider>
   );
 };
 
-export default Sidebar;
+export default SidebarComponent;
