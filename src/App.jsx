@@ -1,50 +1,48 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import HeaderComponent from './components/Header';
-import SidebarComponent from './components/Sidebar';
 import GlobalStyles from './components/GlobalStyles';
-import { Layout } from 'antd';
-import ContentComponent from './components/Content';
-import BreadcrumbComponent from './components/Breadcrumb';
 import { publicRoutes, privateRoutes } from './routes';
-
+import PrivateRoute from './components/PrivateRoute';
+import Login from './pages/Login';
+import DefaultLayout from './components/DefaultLayout';
+import AnotherLayout from './components/AnotherLayout';
 function App() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
     <GlobalStyles>
       <BrowserRouter>
-        <Layout style={{ minHeight: '100vh' }}>
-          <HeaderComponent />
-          <Layout>
-            <SidebarComponent collapsed={collapsed} setCollapsed={setCollapsed} />
-            <Layout style={{ padding: '16px' }}>
-              <BreadcrumbComponent />
-              <ContentComponent>
-                <Routes>
-                  {publicRoutes.map((route) => {
-                    const Page = route.component;
-                    return <Route key={route.path} path={route.path} element={<Page />} />;
-                  })}
-                  {privateRoutes.map((route) => {
-                    const Page = route.component;
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={
-                          // <PrivateRoutes>
-                          <Page />
-                          // </PrivateRoutes>
-                        }
-                      />
-                    );
-                  })}
-                </Routes>
-              </ContentComponent>
-            </Layout>
-          </Layout>
-        </Layout>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <AnotherLayout>
+                <Login />
+              </AnotherLayout>
+            }
+          />
+          {/* Cần layout */}
+          <Route element={<DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed} />}>
+            {publicRoutes.map((route) => {
+              const Page = route.component;
+              return <Route key={route.path} path={route.path} element={<Page />} />;
+            })}
+            {privateRoutes.map((route) => {
+              const Page = route.component;
+              return (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={
+                    <PrivateRoute>
+                      <Page />
+                    </PrivateRoute>
+                  }
+                />
+              );
+            })}
+          </Route>
+        </Routes>
       </BrowserRouter>
     </GlobalStyles>
   );

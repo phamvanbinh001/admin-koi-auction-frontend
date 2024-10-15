@@ -4,8 +4,10 @@ import { Layout } from 'antd';
 
 const { Content } = Layout;
 
-const ContentComponent = ({ children }) => {
-  return <Content className={styles.content}>{'Content' || children}</Content>;
-};
+const ContentComponent = React.memo(({ children }) => {
+  console.log('render ContentComponent');
+
+  return <Content className={styles.content}>{children || 'Content'}</Content>;
+});
 
 export default ContentComponent;

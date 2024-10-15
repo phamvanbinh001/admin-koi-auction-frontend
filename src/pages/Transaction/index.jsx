@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Spin, Button, Input, DatePicker, Space, Select, Slider, Flex } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-import api from '../../auth/api';
+import api from '../../configs/api';
 import axios from 'axios';
 import { format } from 'date-fns';
 import * as XLSX from 'xlsx';

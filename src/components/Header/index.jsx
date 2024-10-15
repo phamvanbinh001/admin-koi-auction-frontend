@@ -9,7 +9,8 @@ import styles from './index.module.scss';
 
 const { Header } = Layout;
 
-const HeaderComponent = () => {
+const HeaderComponent = React.memo(() => {
+  console.log('render HeaderComponent');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationCount, setNotificationCount] = useState(5); // Số lượng thông báo giả định
 
@@ -49,6 +50,6 @@ const HeaderComponent = () => {
       </div>
     </Header>
   );
-};
+});
 
 export default HeaderComponent;

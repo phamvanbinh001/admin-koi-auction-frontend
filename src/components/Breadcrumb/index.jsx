@@ -1,7 +1,9 @@
 import React from 'react';
 import { Breadcrumb, ConfigProvider } from 'antd';
 import styles from './index.module.scss';
-const BreadcrumbComponent = () => {
+const BreadcrumbComponent = React.memo(() => {
+  console.log('render BreadcrumbComponent');
+
   const items = [
     {
       title: 'Home',
@@ -17,6 +19,6 @@ const BreadcrumbComponent = () => {
       <Breadcrumb items={items} />
     </div>
   );
-};
+});
 
 export default BreadcrumbComponent;
