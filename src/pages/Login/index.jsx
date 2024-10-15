@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Form, Divider, Input, Button, notification } from 'antd';
-import api from '../../auth/api';
+import api from '../../configs/api';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthProvider';
+import useUserStore from '../../configs/useUserStore';
 import './Login.css';
 import Logo from '../../components/Logo';
 
 const Login = () => {
+  console.log('Login');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { loginUser } = useUserStore();
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -18,16 +19,16 @@ const Login = () => {
 
       // Kiểm tra xem token có tồn tại không
       if (response.data && response.data.token) {
-        const token = response.data.token;
-        const role = response.data.role; // Giả sử API trả về role
+        // const token = response.data.token;
+        const role = response.data.role;
 
         // Cập nhật trạng thái xác thực
-        login(token);
-        localStorage.setItem('role', role); // Lưu vai trò vào local storage
+        loginUser(response.data);
+        // localStorage.setItem('role', role);
 
-        // Điều hướng dựa trên vai trò
         if (role === 'Admin' || role === 'Staff') {
-          navigate('/'); // Chuyển hướng đến trang chính
+          localStorage.setItem('user', response.data);
+          navigate('/');
         } else {
           notification.error({
             message: 'Access Denied',
@@ -45,6 +46,8 @@ const Login = () => {
           description: error.response.data.message || 'Invalid username or password!',
         });
       } else {
+        console.log(error);
+
         notification.error({
           message: 'Login Failed',
           description: error.message || 'An error occurred during login!',
@@ -67,7 +70,7 @@ const Login = () => {
           <Divider orientation="left" plain style={{ color: 'gray' }}>
             Manage system
           </Divider>
-          <Form name="login" onFinish={onFinish}>
+          <Form onFinish={onFinish}>
             <Form.Item name="userName" rules={[{ required: true, message: 'Please input your username or email!' }]}>
               <Input placeholder="Enter email or username" />
             </Form.Item>
@@ -80,12 +83,13 @@ const Login = () => {
               </Button>
             </Form.Item>
           </Form>
+
           <a className="forgot-password" href="/forgot-password">
             Forgot password?
           </a>
         </div>
         <div className="login-banner">
-          <video src="src/assets/videoLogin.mp4" autoPlay loop muted></video>
+          <video src="src\assets\tienca.mp4" autoPlay loop muted></video>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal, Button, Space } from 'antd';
-import api from '../../auth/api'; // Import đúng đường dẫn API của bạn
+import api from '../../configs/api'; // Import đúng đường dẫn API của bạn
 
 const RequestPage = () => {
   const [auctionRequests, setAuctionRequests] = useState([]);
