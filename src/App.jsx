@@ -3,9 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './components/GlobalStyles';
 import { publicRoutes, privateRoutes } from './routes';
 import PrivateRoute from './components/PrivateRoute';
-import Login from './pages/Login';
 import DefaultLayout from './components/DefaultLayout';
-import AnotherLayout from './components/AnotherLayout';
 function App() {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -13,42 +11,29 @@ function App() {
     <GlobalStyles>
       <BrowserRouter>
         <Routes>
+          {/* Không cần layout */}
           {publicRoutes.map((route) => {
+            const Page = route.component;
+            return <Route key={route.path} path={route.path} element={<Page />} />;
+          })}
+
+          {/* Cần layout */}
+          {privateRoutes.map((route) => {
             const Page = route.component;
             return (
               <Route
                 key={route.path}
                 path={route.path}
                 element={
-                  <AnotherLayout>
-                    <Page />
-                  </AnotherLayout>
+                  <PrivateRoute>
+                    <DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed}>
+                      <Page />
+                    </DefaultLayout>
+                  </PrivateRoute>
                 }
               />
             );
           })}
-
-          {/* Cần layout */}
-          <Route element={<DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed} />}>
-            {publicRoutes.map((route) => {
-              const Page = route.component;
-              return <Route key={route.path} path={route.path} element={<Page />} />;
-            })}
-            {privateRoutes.map((route) => {
-              const Page = route.component;
-              return (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={
-                    <PrivateRoute>
-                      <Page />
-                    </PrivateRoute>
-                  }
-                />
-              );
-            })}
-          </Route>
         </Routes>
       </BrowserRouter>
     </GlobalStyles>

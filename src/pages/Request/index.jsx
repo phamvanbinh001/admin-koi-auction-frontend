@@ -14,9 +14,15 @@ const RequestPage = () => {
 
   useEffect(() => {
     // Fetch auction requests data
-    const fetchData = async () => {
+    const fetchData = async (page = 1, size = 10) => {
       try {
-        const response = await api.get('/auction/get-auction-requets');
+        const response = await api.get('/auction/get-auction-requets', {
+          requireAuth: true,
+          params: {
+            page,
+            size,
+          },
+        });
         setAuctionRequests(response.data);
       } catch (error) {
         console.error('Failed to fetch data', error);

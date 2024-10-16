@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Layout, Menu, Button } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome,
-  faChartLine,
+  faFolderOpen,
   faCogs,
   faSignOutAlt,
   faEnvelope,
@@ -22,21 +22,17 @@ import useUserStore from '../../configs/useUserStore';
 
 const { Sider } = Layout;
 
-const SidebarComponent = React.memo(({ collapsed, setCollapsed }) => {
+const SidebarComponent = React.memo(() => {
   console.log('render SidebarComponent');
   const { logout } = useUserStore();
   const navigate = useNavigate();
-
+  const [collapsed, setCollapsed] = useState(false);
+  const { user } = useUserStore();
   //Tránh việc reRender kể cả khi props không thay đổi
-  const role = useMemo(() => localStorage.getItem('role'), []);
+  const role = useMemo(() => user.role, []);
 
   const handleLogout = () => {
-    console.log('logging out');
-
     logout();
-
-    console.log('navigate to login');
-
     navigate('/login');
   };
 
@@ -74,8 +70,8 @@ const SidebarComponent = React.memo(({ collapsed, setCollapsed }) => {
           },
           {
             key: '1000',
-            label: <Link to="/chart">Charts</Link>,
-            icon: <FontAwesomeIcon icon={faChartLine} />,
+            label: <Link to="/category">Category</Link>,
+            icon: <FontAwesomeIcon icon={faFolderOpen} />,
           },
           //tránh việc render ra undefined
         ].filter(Boolean),

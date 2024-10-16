@@ -21,16 +21,14 @@ const TransactionManagement = () => {
     walletID: null,
   });
 
-  // Fetch API
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);
       try {
-        // const response = await api.get('/wallet/transactions');
-        // const data = await response.json();
-        const response = await axios.get(
-          'https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/api/wallet/transactions',
-        );
+        const response = await api.get('/wallet/transactions', {
+          requireAuth: true,
+        });
+
         setTransactions(response.data);
         setFilteredTransactions(response.data);
         calculateTotalAmount(response.data);
@@ -44,7 +42,6 @@ const TransactionManagement = () => {
     fetchTransactions();
   }, []);
 
-  // Tính tổng số tiền
   const calculateTotalAmount = (data) => {
     const total = data.reduce((acc, transaction) => acc + transaction.walletID.amount, 0);
     setTotalAmount(total);
@@ -93,7 +90,6 @@ const TransactionManagement = () => {
     setFilteredTransactions(filtered);
   };
 
-  // Xuất ra Excel
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredTransactions);
     const workbook = XLSX.utils.book_new();
@@ -101,7 +97,6 @@ const TransactionManagement = () => {
     XLSX.writeFile(workbook, 'transaction_data.xlsx');
   };
 
-  // Định nghĩa các cột của bảng
   const columns = [
     { title: 'Transaction ID', dataIndex: 'id' },
     { title: 'Wallet ID', dataIndex: ['walletID', 'id'] },
@@ -119,7 +114,6 @@ const TransactionManagement = () => {
 
   return (
     <div>
-      {/* Khu vực hiển thị số tiền hiện tại của hệ thống */}
       <h2>Total Amount in System: {totalAmount.toLocaleString()} VND</h2>
 
       {/* Khu vực filter */}

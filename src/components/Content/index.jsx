@@ -7,7 +7,7 @@ const { Content } = Layout;
 const ContentComponent = React.memo(({ children }) => {
   console.log('render ContentComponent');
 
-  return <Content className={styles.content}>{children || 'Content'}</Content>;
+  return <Content className={styles.content}>{children}</Content>;
 });
 
 export default ContentComponent;

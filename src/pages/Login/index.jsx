@@ -10,41 +10,39 @@ const Login = () => {
   console.log('Login');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { loginUser } = useUserStore();
+  const { login } = useUserStore();
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
       const response = await api.post('/security/login', values);
 
-      // Kiểm tra xem token có tồn tại không
       if (response.data && response.data.token) {
-        const role = response.data.role;
-
-        loginUser(response.data);
-
-        if (role === 'Admin' || role === 'Staff') {
-          localStorage.setItem('user', response.data);
+        const userRole = response.data.role;
+        if (userRole === 'Admin' || userRole === 'Staff') {
+          login({
+            ...response.data,
+            isAuthenticated: true,
+          });
           navigate('/');
         } else {
-          notification.error({
-            message: 'Access Denied',
-            description: 'You do not have permission to access this application.',
-          });
+          throw new Error('Access denied: You do not have the required permissions.');
         }
       } else {
         throw new Error('Token not found in response');
       }
     } catch (error) {
-      // Kiểm tra nếu lỗi có phản hồi từ server
-      if (error.response) {
+      if (error.message === 'Access denied: You do not have the required permissions.') {
+        notification.error({
+          message: 'Access Denied',
+          description: 'You do not have the necessary permissions to access this resource.',
+        });
+      } else if (error.response) {
         notification.error({
           message: 'Login Failed',
           description: error.response.data.message || 'Invalid username or password!',
         });
       } else {
-        console.log(error);
-
         notification.error({
           message: 'Login Failed',
           description: error.message || 'An error occurred during login!',
@@ -86,7 +84,7 @@ const Login = () => {
           </a>
         </div>
         <div className="login-banner">
-          <video src="src\assets\videoLogin.mp4" autoPlay loop muted></video>
+          <video src="src\assets\tienca.mp4" autoPlay loop muted></video>
         </div>
       </div>
     </div>

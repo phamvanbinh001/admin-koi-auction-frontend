@@ -5,12 +5,13 @@ import SidebarComponent from './Sidebar';
 import BreadcrumbComponent from './Breadcrumb';
 import ContentComponent from './Content';
 
-const DefaultLayout = ({ children, collapsed, setCollapsed }) => {
+const DefaultLayout = ({ children }) => {
+  console.log('render DefaultLayout');
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <HeaderComponent />
       <Layout>
-        <SidebarComponent collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SidebarComponent />
         <Layout style={{ padding: '16px' }}>
           <BreadcrumbComponent />
           <ContentComponent>{children}</ContentComponent>
@@ -20,4 +21,4 @@ const DefaultLayout = ({ children, collapsed, setCollapsed }) => {
   );
 };
 
-export default DefaultLayout;
+export default React.memo(DefaultLayout);
