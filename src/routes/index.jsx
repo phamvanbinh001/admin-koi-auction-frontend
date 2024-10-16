@@ -13,9 +13,12 @@ import Blog from '../pages/Blog';
 import Requirement from '../pages/Auction';
 import Transaction from '../pages/Transaction';
 import Page401 from '../pages/401';
+import Page404 from '../pages/404';
+import Category from '../pages/Category';
 
 const publicRoutes = [
   { path: '/401', component: Page401 },
+  { path: '/404', component: Page404 },
   { path: '/login', component: Login },
 ];
 
@@ -33,6 +36,7 @@ const privateRoutes = [
   { path: '/blog', component: Blog },
   { path: '/requirement', component: Requirement },
   { path: '/transaction', component: Transaction },
+  { path: '/category', component: Category },
 ];
 
 export { publicRoutes, privateRoutes };

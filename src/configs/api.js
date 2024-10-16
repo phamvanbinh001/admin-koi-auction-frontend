@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
+import useUserStore from './useUserStore';
 
 const baseURL = import.meta.env.VITE_API_URL;
 const api = axios.create({
@@ -14,14 +14,15 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        if (config.requiresAuth) {
-            // const token = localStorage.getItem('token');
-            const token = JSON.parse(localStorage.getItem('userData')).token;
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            } else {
-                console.error('Token not available!');
-            }
+        const { user } = useUserStore.getState();
+        // console.log('current user:', user);
+
+        const token = user.token;
+        if (config.requireAuth && token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        else if (config.requireAuth && !token) {
+            console.error('Token not available!');
         }
         return config;
     },

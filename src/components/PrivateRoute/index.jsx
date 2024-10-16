@@ -5,8 +5,14 @@ import useUserStore from '../../configs/useUserStore';
 const PrivateRoute = ({ children }) => {
   const { user } = useUserStore();
   const isAuthenticated = user.isAuthenticated;
+  const userRole = user.role;
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  if (!isAuthenticated || (userRole !== 'Admin' && userRole !== 'Staff')) {
+    return <Navigate to="/login" />;
+  }
+  console.log('render PrivateRoute');
+
+  return children;
 };
 
-export default PrivateRoute;
+export default React.memo(PrivateRoute);

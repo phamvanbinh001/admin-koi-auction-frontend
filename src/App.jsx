@@ -10,10 +10,12 @@ import { publicRoutes, privateRoutes } from './routes';
 >>>>>>> 2dcbb75 (fixing loi khong co defaultlayout)
 =======
 import PrivateRoute from './components/PrivateRoute';
-import Login from './pages/Login';
 import DefaultLayout from './components/DefaultLayout';
+<<<<<<< HEAD
 import AnotherLayout from './components/AnotherLayout';
 >>>>>>> eb748c7 (Rebuilt layout part 2)
+=======
+>>>>>>> d573450 (CSS for dashboard)
 function App() {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -21,42 +23,29 @@ function App() {
     <GlobalStyles>
       <BrowserRouter>
         <Routes>
+          {/* Không cần layout */}
           {publicRoutes.map((route) => {
+            const Page = route.component;
+            return <Route key={route.path} path={route.path} element={<Page />} />;
+          })}
+
+          {/* Cần layout */}
+          {privateRoutes.map((route) => {
             const Page = route.component;
             return (
               <Route
                 key={route.path}
                 path={route.path}
                 element={
-                  <AnotherLayout>
-                    <Page />
-                  </AnotherLayout>
+                  <PrivateRoute>
+                    <DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed}>
+                      <Page />
+                    </DefaultLayout>
+                  </PrivateRoute>
                 }
               />
             );
           })}
-
-          {/* Cần layout */}
-          <Route element={<DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed} />}>
-            {publicRoutes.map((route) => {
-              const Page = route.component;
-              return <Route key={route.path} path={route.path} element={<Page />} />;
-            })}
-            {privateRoutes.map((route) => {
-              const Page = route.component;
-              return (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={
-                    <PrivateRoute>
-                      <Page />
-                    </PrivateRoute>
-                  }
-                />
-              );
-            })}
-          </Route>
         </Routes>
       </BrowserRouter>
     </GlobalStyles>

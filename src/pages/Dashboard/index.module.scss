@@ -1,0 +1,54 @@
+.dashboard {
+  padding: 20px;
+  background-color: #f4f7fa; /* Màu nền nhẹ cho trang */
+}
+
+.summaryWrapper {
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 30px;
+}
+
+.summaryCard {
+  flex: 1;
+  margin: 0 10px; /* Khoảng cách giữa các ô summary */
+  padding: 20px;
+  border: 2px solid #15253d;
+  border-radius: 12px;
+  text-align: end;
+  background-color: #148cdb; /* Màu nền cho ô */
+  box-shadow: 0 4px 10px rgba(36, 34, 34, 0.1); /* Đổ bóng nhẹ cho ô */
+  transition: transform 0.3s; /* Hiệu ứng chuyển động khi hover */
+
+  &:hover {
+    transform: translateY(-5px); /* Di chuyển nhẹ lên khi hover */
+    box-shadow: 0 6px 15px rgba(46, 12, 12, 0.15); /* Đổ bóng sâu hơn khi hover */
+  }
+}
+
+.chartWrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.chartBorder {
+  border: 2px solid #e0e0e0; /* Viền cho biểu đồ */
+  border-radius: 12px; /* Bo góc */
+  padding: 15px; /* Khoảng cách bên trong */
+  width: 65%; /* Chiếm 65% chiều rộng */
+  height: 250px; /* Chiều cao biểu đồ */
+  background-color: #ffffff; /* Màu nền cho biểu đồ */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ cho biểu đồ */
+}
+
+.chartBorderPie {
+  border: 2px solid #e0e0e0; /* Viền cho biểu đồ */
+  border-radius: 12px; /* Bo góc */
+  padding: 15px; /* Khoảng cách bên trong */
+  width: 30%; /* Giảm chiều rộng của khối bao quanh biểu đồ tròn */
+  height: 250px; /* Chiều cao biểu đồ */
+  margin-left: 15px; /* Giảm khoảng cách bên trái của biểu đồ tròn */
+  background-color: #ffffff; /* Màu nền cho biểu đồ */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ cho biểu đồ */
+}

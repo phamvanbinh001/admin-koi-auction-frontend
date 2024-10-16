@@ -1,7 +1,14 @@
 import React from 'react';
+import styles from './index.module.scss';
 
-const NotFound = () => {
-  return <h1>401 </h1>;
+const Page404 = () => {
+  console.log('render Page404');
+
+  return (
+    <div className={styles.container}>
+      <img src="src/assets/404.png" alt="404 Page" className={styles.image} />
+    </div>
+  );
 };
 
-export default NotFound;
+export default Page404;
