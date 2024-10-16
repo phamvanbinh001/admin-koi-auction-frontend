@@ -1,19 +1,12 @@
 import React from 'react';
-import useUserStore from '../../configs/useUserStore';
 import { Navigate } from 'react-router-dom';
+import useUserStore from '../../configs/useUserStore';
 
-const PrivateRoute = ({ children, requireRole }) => {
+const PrivateRoute = ({ children }) => {
   const { user } = useUserStore();
+  const isAuthenticated = user.isAuthenticated;
 
-  //   if (!user.isAuthenticated) {
-  //     return <Navigate to="/login" />;
-  //   }
-
-  //   if (requireRole && user.role !== requireRole) {
-  //     return <Navigate to="/401" />;
-  //   }
-
-  return children;
+  return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

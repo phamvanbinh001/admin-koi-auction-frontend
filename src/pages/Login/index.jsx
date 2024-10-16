@@ -19,12 +19,9 @@ const Login = () => {
 
       // Kiểm tra xem token có tồn tại không
       if (response.data && response.data.token) {
-        // const token = response.data.token;
         const role = response.data.role;
 
-        // Cập nhật trạng thái xác thực
         loginUser(response.data);
-        // localStorage.setItem('role', role);
 
         if (role === 'Admin' || role === 'Staff') {
           localStorage.setItem('user', response.data);
@@ -89,7 +86,7 @@ const Login = () => {
           </a>
         </div>
         <div className="login-banner">
-          <video src="src\assets\tienca.mp4" autoPlay loop muted></video>
+          <video src="src\assets\videoLogin.mp4" autoPlay loop muted></video>
         </div>
       </div>
     </div>

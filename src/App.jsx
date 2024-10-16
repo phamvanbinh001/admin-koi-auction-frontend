@@ -13,14 +13,21 @@ function App() {
     <GlobalStyles>
       <BrowserRouter>
         <Routes>
-          <Route
-            path="/login"
-            element={
-              <AnotherLayout>
-                <Login />
-              </AnotherLayout>
-            }
-          />
+          {publicRoutes.map((route) => {
+            const Page = route.component;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <AnotherLayout>
+                    <Page />
+                  </AnotherLayout>
+                }
+              />
+            );
+          })}
+
           {/* Cần layout */}
           <Route element={<DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed} />}>
             {publicRoutes.map((route) => {
