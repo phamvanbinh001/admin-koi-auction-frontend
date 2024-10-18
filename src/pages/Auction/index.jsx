@@ -10,26 +10,35 @@ import FishPopover from '../../components/Popover/FishPopover';
 const Auction = () => {
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalElements, setTotalElements] = useState(0); // Để quản lý tổng số phần tử
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const [pageSize, setPageSize] = useState(10); // Số phần tử trên mỗi trang
 
+  // Hàm để fetch dữ liệu auction
+  const fetchData = async (page = 1, size = 10) => {
+    setLoading(true);
+    try {
+      const response = await api.get('auction/admin/get-all', {
+        requireAuth: true,
+        params: {
+          page,
+          size,
+        },
+      });
+
+      setAuctions(response.data.content); // Cập nhật dữ liệu auction
+      setTotalElements(response.data.totalElements); // Cập nhật tổng số phần tử để hiển thị pagination
+    } catch (error) {
+      console.error('Failed to fetch auction data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // useEffect để fetch dữ liệu khi component render lần đầu tiên
   useEffect(() => {
-    const fetchData = async (page = 1, size = 10) => {
-      try {
-        const response = await api.get('/auction/get-all', {
-          requireAuth: true,
-          params: {
-            page,
-            size,
-          },
-        });
-        setAuctions(response.data);
-      } catch (error) {
-        console.error('Failed to fetch auction data', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    fetchData(currentPage, pageSize);
+  }, [currentPage, pageSize]); // Fetch lại dữ liệu khi trang hoặc kích thước trang thay đổi
 
   // handle null value to uppercase
   const toUpperCase2 = (value) => {
@@ -182,8 +191,11 @@ const Auction = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Auctions'); // Thêm sheet vào workbook
     XLSX.writeFile(workbook, 'AuctionsData.xlsx'); // Xuất file Excel
   };
+
   return (
     <>
+      <h2 style={{ marginBottom: '20px' }}>{`Có tổng cộng ${totalElements} cuộc đấu giá`}</h2>
+
       <Flex gap="small" align="flex-end" vertical onClick={exportToExcel} style={{ marginBottom: '20px' }}>
         <Flex gap="small" wrap>
           <Button type="primary" icon={<DownloadOutlined />} size={'middle'}>
@@ -191,7 +203,23 @@ const Auction = () => {
           </Button>
         </Flex>
       </Flex>
-      <Table columns={columns} dataSource={auctions} loading={loading} rowKey={(record) => record.auction.id} />
+
+      <Table
+        columns={columns}
+        dataSource={auctions}
+        loading={loading}
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          // Tổng số phần tử để hiện pagination
+          // total: totalElements,
+          onChange: (page, size) => {
+            setCurrentPage(page);
+            setPageSize(size);
+          },
+        }}
+        rowKey={(record) => record.auction.id}
+      />
     </>
   );
 };

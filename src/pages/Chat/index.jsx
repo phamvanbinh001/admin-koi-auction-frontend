@@ -1,77 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Input, List, Typography } from 'antd';
-import io from 'socket.io-client';
+import React, { useState } from 'react';
+import styles from './index.module.scss';
 
-const { TextArea } = Input;
-const { Title } = Typography;
+const Chat = () => {
+  const [contacts] = useState([
+    { id: 1, name: 'Vincent Porter', status: 'left 7 mins ago', avatar: 'https://i.pravatar.cc/150?img=3' },
+    { id: 2, name: 'Aiden Chavez', status: 'online', avatar: 'https://i.pravatar.cc/150?img=4' },
+    { id: 3, name: 'Mike Thomas', status: 'online', avatar: 'https://i.pravatar.cc/150?img=5' },
+  ]);
 
-// Kết nối đến WebSocket server
-// const socket = io('http://localhost:4000');
+  const [messages] = useState([
+    { id: 1, from: 'other', text: 'Hi Aiden, how are you? How is the project coming along?', time: '10:10 AM' },
+    { id: 2, from: 'me', text: 'Hi! I am good! How about you?', time: '10:12 AM' },
+    { id: 3, from: 'other', text: 'Are we meeting today?', time: '10:15 AM' },
+    { id: 4, from: 'me', text: 'Project has already been finished and I have results to show you.', time: '10:16 AM' },
+  ]);
 
-const Chat = ({ userId, recipientId }) => {
-  // const [messages, setMessages] = useState([]);
-  // const [newMessage, setNewMessage] = useState('');
-  // // Lắng nghe tin nhắn mới từ server
-  // useEffect(() => {
-  //   socket.on('receive_message', (message) => {
-  //     // Chỉ hiển thị tin nhắn giữa userId và recipientId
-  //     if (
-  //       (message.sender === userId && message.recipient === recipientId) ||
-  //       (message.sender === recipientId && message.recipient === userId)
-  //     ) {
-  //       setMessages((prevMessages) => [...prevMessages, message]);
-  //     }
-  //   });
-  //   return () => {
-  //     socket.off('receive_message');
-  //   };
-  // }, [userId, recipientId]);
-  // // Gửi tin nhắn
-  // const sendMessage = () => {
-  //   if (newMessage) {
-  //     const message = {
-  //       sender: userId, // Người gửi là user hiện tại
-  //       recipient: recipientId, // Người nhận là người kia
-  //       content: newMessage,
-  //       time: new Date(),
-  //     };
-  //     // Gửi tin nhắn lên server
-  //     socket.emit('send_message', message);
-  //     setMessages((prevMessages) => [...prevMessages, message]);
-  //     setNewMessage(''); // Xóa khung nhập sau khi gửi
-  //   }
-  // };
-  // return (
-  //   <div style={{ padding: 20 }}>
-  //     <Title level={3}>Private Chat with User {recipientId}</Title>
-  //     {/* Danh sách tin nhắn */}
-  //     <List
-  //       bordered
-  //       dataSource={messages}
-  //       renderItem={(item) => (
-  //         <List.Item>
-  //           <List.Item.Meta
-  //             title={`From: ${item.sender === userId ? 'You' : 'User ' + recipientId}`}
-  //             description={item.content}
-  //           />
-  //         </List.Item>
-  //       )}
-  //       style={{ marginBottom: 20, height: '50vh', overflowY: 'auto' }}
-  //     />
-  //     {/* Khung nhập liệu */}
-  //     <TextArea
-  //       rows={2}
-  //       value={newMessage}
-  //       onChange={(e) => setNewMessage(e.target.value)}
-  //       placeholder="Type a message..."
-  //       style={{ marginBottom: 10 }}
-  //     />
-  //     {/* Nút gửi tin nhắn */}
-  //     <Button type="primary" onClick={sendMessage}>
-  //       Send Message
-  //     </Button>
-  //   </div>
-  // );
+  return (
+    <div className={styles.chatContainer}>
+      {/* Danh sách liên hệ bên trái */}
+      <div className={styles.contactList}>
+        <div className={styles.search}>
+          <input type="text" placeholder="Search..." />
+        </div>
+        <ul>
+          {contacts.map((contact) => (
+            <li key={contact.id} className={styles.contactItem}>
+              <img src={contact.avatar} alt={contact.name} className={styles.contactAvatar} />
+              <div>
+                <h4>{contact.name}</h4>
+                <span>{contact.status}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Phần tin nhắn bên phải */}
+      <div className={styles.chatSection}>
+        <div className={styles.currentChatHeader}>
+          <h3>Aiden Chavez</h3>
+          <span>Last seen: 2 hours ago</span>
+        </div>
+        <ul className={styles.messageList}>
+          {messages.map((message) => (
+            <li
+              key={message.id}
+              className={`${styles.message} ${message.from === 'me' ? styles.myMessage : styles.otherMessage}`}
+            >
+              {message.from === 'other' && (
+                <img src="https://i.pravatar.cc/150?img=4" alt="avatar" className={styles.avatar} />
+              )}
+              <div className={styles.messageContent}>
+                <span className={styles.messageTime}>{message.time}</span>
+                <div className={styles.messageText}>{message.text}</div>
+              </div>
+              {message.from === 'me' && (
+                <img src="https://i.pravatar.cc/150?img=5" alt="avatar" className={styles.avatar} />
+              )}
+            </li>
+          ))}
+        </ul>
+        <div className={styles.inputContainer}>
+          <input type="text" placeholder="Enter text here..." className={styles.inputField} />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Chat;

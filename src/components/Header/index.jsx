@@ -1,11 +1,10 @@
-// src/components/Header/index.jsx
-
 import React, { useState } from 'react';
 import Logo from '../Logo'; // Giả định bạn có một component Logo
 import { Layout, Switch, Dropdown, Menu, Badge } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faUserCircle, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import styles from './index.module.scss';
+import { Link } from 'react-router-dom';
 
 const { Header } = Layout;
 
@@ -45,7 +44,9 @@ const HeaderComponent = React.memo(() => {
           <Badge count={notificationCount} overflowCount={99}>
             <FontAwesomeIcon icon={faBell} className={styles['notification-icon']} />
           </Badge>
-          <FontAwesomeIcon icon={faUserCircle} className={styles['user-icon']} />
+          <Link to="/profile">
+            <FontAwesomeIcon icon={faUserCircle} className={styles['user-icon']} />
+          </Link>
         </div>
       </div>
     </Header>
