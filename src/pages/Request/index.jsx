@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal, Button, Space } from 'antd';
-import api from '../../configs/api'; // Import đúng đường dẫn API của bạn
+import api from '../../configs/api';
 
 const RequestPage = () => {
   const [auctionRequests, setAuctionRequests] = useState([]);
@@ -10,13 +10,13 @@ const RequestPage = () => {
   const [isKoiModalOpen, setIsKoiModalOpen] = useState(false);
   const [isOwnerModalOpen, setIsOwnerModalOpen] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
-  const [currentAuction, setCurrentAuction] = useState(null); // Để lưu phiên đấu giá hiện tại khi mở Action Modal
+  const [currentAuction, setCurrentAuction] = useState(null);
 
   useEffect(() => {
     // Fetch auction requests data
     const fetchData = async (page = 1, size = 10) => {
       try {
-        const response = await api.get('/auction/get-auction-requets', {
+        const response = await api.get('/auction/staff/get-auction-request', {
           requireAuth: true,
           params: {
             page,

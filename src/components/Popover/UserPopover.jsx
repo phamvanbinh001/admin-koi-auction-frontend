@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Popover, Spin, Avatar, Button } from 'antd';
 import { StarFilled } from '@ant-design/icons';
-import axios from 'axios';
+import api from '../../configs/api';
 
 const UserPopover = ({ userId, children }) => {
   const [userData, setUserData] = useState(null);
@@ -11,9 +11,13 @@ const UserPopover = ({ userId, children }) => {
     if (!userData) {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/api/admin-manager/users/get-user/${userId}`,
-        );
+        // const response = await axios.get(
+        //   `https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/api/admin-manager/users/get-user/${userId}`,
+        // );
+
+        const response = await api.get(`admin-manager/users/get-user/${userId}`, {
+          requireAuth: true,
+        });
         setUserData(response.data);
       } catch (error) {
         setUserData('Failed to fetch user data');
