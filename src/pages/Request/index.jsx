@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Button, Space } from 'antd';
+import { Table, Modal, Button, Space, Pagination } from 'antd';
 import api from '../../configs/api';
+import FishPopover from '../../components/Popover/FishPopover';
+import UserPopover from '../../components/Popover/UserPopover';
 
-const RequestPage = () => {
+const Request = () => {
   const [auctionRequests, setAuctionRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedKoi, setSelectedKoi] = useState(null);
@@ -11,35 +13,42 @@ const RequestPage = () => {
   const [isOwnerModalOpen, setIsOwnerModalOpen] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [currentAuction, setCurrentAuction] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0); // Mặc định trang đầu là 0
+  const [totalPages, setTotalPages] = useState(0); // Lưu tổng số trang
 
-  useEffect(() => {
-    // Fetch auction requests data
-    const fetchData = async (page = 1, size = 10) => {
-      try {
-        const response = await api.get('/auction/staff/get-auction-request', {
-          requireAuth: true,
-          params: {
-            page,
-            size,
-          },
-        });
-        setAuctionRequests(response.data);
-      } catch (error) {
-        console.error('Failed to fetch data', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const handleKoiClick = (koi) => {
-    setSelectedKoi(koi);
-    setIsKoiModalOpen(true);
+  // Hàm fetch data với tham số page
+  const fetchData = async (page = 0, size = 2) => {
+    try {
+      setLoading(true);
+      const response = await api.get('/auction/staff/get-auction-request', {
+        requireAuth: true,
+        params: {
+          page,
+          size,
+        },
+      });
+      setAuctionRequests(response.data.content);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error('Failed to fetch data');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleOwnerClick = (owner) => {
-    setSelectedOwner(owner);
+  useEffect(() => {
+    fetchData(currentPage); // Gọi fetchData khi component load với trang hiện tại là 0
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    console.log('render page: ', page);
+
+    setCurrentPage(page - 1); // Chuyển trang, nhưng trừ đi 1 để đúng với API bắt đầu từ 0
+    fetchData(page - 1);
+  };
+
+  const handleOwnerClick = (record) => {
+    setSelectedOwner(record.auction.breederID);
     setIsOwnerModalOpen(true);
   };
 
@@ -49,65 +58,66 @@ const RequestPage = () => {
   };
 
   const handleApprove = () => {
-    // Gọi API để duyệt yêu cầu đấu giá
     console.log('Approve auction', currentAuction);
-    setIsActionModalOpen(false); // Đóng modal sau khi thực hiện hành động
+    setIsActionModalOpen(false);
   };
 
   const handleReject = () => {
-    // Gọi API để từ chối yêu cầu đấu giá
     console.log('Reject auction', currentAuction);
-    setIsActionModalOpen(false); // Đóng modal sau khi thực hiện hành động
+    setIsActionModalOpen(false);
   };
 
   const columns = [
     {
-      title: 'ID of Koi',
-      dataIndex: 'auctionId',
+      title: 'Auction ID',
+      dataIndex: ['auction', 'id'],
       key: 'auctionId',
-      render: (text, record) => (
-        <Button type="link" onClick={() => handleKoiClick(record)}>
-          {text}
-        </Button>
-      ),
     },
     {
-      title: 'Variety',
-      dataIndex: 'variety',
-      key: 'variety',
+      title: 'Koi ID',
+      dataIndex: 'koiFish',
+      key: 'koiFish',
+      render: (koiFish) => koiFish.join(', '),
     },
     {
-      title: 'Starting Bid',
-      dataIndex: 'startingBid',
-      key: 'startingBid',
-    },
-    {
-      title: 'Estimated Value',
-      dataIndex: 'estimatedValue',
-      key: 'estimatedValue',
+      title: 'Starting Price',
+      dataIndex: ['auction', 'startingPrice'],
+      key: 'startingPrice',
     },
     {
       title: 'Buy Now Price',
-      dataIndex: 'buyNowPrice',
-      key: 'buyNowPrice',
+      dataIndex: ['auction', 'buyoutPrice'],
+      key: 'buyoutPrice',
     },
     {
-      title: 'Expected Auction Date',
-      dataIndex: 'expectedAuctionDate',
-      key: 'expectedAuctionDate',
+      title: 'Bid Step',
+      dataIndex: ['auction', 'bidStep'],
+      key: 'bidStep',
     },
     {
-      title: 'Expected End Date',
-      dataIndex: 'expectedEndDate',
-      key: 'expectedEndDate',
+      title: 'Auction method',
+      dataIndex: ['auction', 'auctionMethod'],
+      key: 'auctionMethod',
+    },
+    {
+      title: 'Start Time',
+      dataIndex: ['auction', 'startTime'],
+      key: 'startTime',
+      render: (text) => new Date(text).toLocaleString(),
+    },
+    {
+      title: 'End Time',
+      dataIndex: ['auction', 'endTime'],
+      key: 'endTime',
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: 'Owner',
-      dataIndex: 'breederName',
-      key: 'breederName',
+      dataIndex: ['auction', 'breederID'],
+      key: 'breederID',
       render: (text, record) => (
         <Button type="link" onClick={() => handleOwnerClick(record)}>
-          {text}
+          Breeder {text}
         </Button>
       ),
     },
@@ -126,34 +136,21 @@ const RequestPage = () => {
 
   return (
     <>
-      <Table columns={columns} dataSource={auctionRequests} loading={loading} rowKey="auctionId" />
+      <Table
+        columns={columns}
+        dataSource={auctionRequests}
+        loading={loading}
+        rowKey={(record) => record.auction.id}
+        pagination={false} // Tắt phân trang của Ant Design, dùng Pagination riêng
+      />
 
       {/* Koi Details Modal */}
       <Modal title="Koi Details" open={isKoiModalOpen} onCancel={() => setIsKoiModalOpen(false)} footer={null}>
         {selectedKoi && (
           <div>
             <p>
-              <strong>ID:</strong> {selectedKoi.auctionId}
+              <strong>Koi Fish IDs:</strong> {selectedKoi.join(', ')}
             </p>
-            <p>
-              <strong>Name:</strong> {selectedKoi.koiName}
-            </p>
-            <p>
-              <strong>Variety:</strong> {selectedKoi.variety}
-            </p>
-            <p>
-              <strong>Starting Bid:</strong> {selectedKoi.startingBid}
-            </p>
-            <p>
-              <strong>Estimated Value:</strong> {selectedKoi.estimatedValue}
-            </p>
-            <p>
-              <strong>Size:</strong> {selectedKoi.size}
-            </p>
-            <p>
-              <strong>Born In:</strong> {selectedKoi.bornIn}
-            </p>
-            <img src={selectedKoi.imageUrl} alt={selectedKoi.koiName} style={{ width: '100%' }} />
           </div>
         )}
       </Modal>
@@ -163,10 +160,7 @@ const RequestPage = () => {
         {selectedOwner && (
           <div>
             <p>
-              <strong>Breeder Name:</strong> {selectedOwner.breederName}
-            </p>
-            <p>
-              <strong>Other Details:</strong> More info can be added here...
+              <strong>Breeder ID:</strong> {selectedOwner}
             </p>
           </div>
         )}
@@ -189,20 +183,32 @@ const RequestPage = () => {
         {currentAuction && (
           <div>
             <p>
-              <strong>ID of Koi:</strong> {currentAuction.auctionId}
+              <strong>ID of Koi:</strong> {currentAuction.auction.id}
             </p>
             <p>
-              <strong>Variety:</strong> {currentAuction.variety}
+              <strong>Starting Price:</strong> {currentAuction.auction.startingPrice}
             </p>
             <p>
-              <strong>Starting Bid:</strong> {currentAuction.startingBid}
+              <strong>Buy Now Price:</strong> {currentAuction.auction.buyoutPrice}
             </p>
             <p>Do you want to approve or reject this auction request?</p>
           </div>
         )}
       </Modal>
+
+      {/* Pagination */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+        {' '}
+        {/* Căn Pagination sang phải */}
+        <Pagination
+          current={currentPage + 1} // Chuyển currentPage từ 0-based sang 1-based cho UI
+          total={totalPages * 10} // Tổng số item (lấy totalPages từ API và nhân với số item mỗi trang)
+          pageSize={10} // Số lượng item trên mỗi trang
+          onChange={handlePageChange} // Gọi hàm khi chuyển trang
+        />
+      </div>
     </>
   );
 };
 
-export default RequestPage;
+export default Request;

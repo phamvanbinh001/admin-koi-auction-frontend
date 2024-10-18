@@ -1,37 +1,49 @@
 import React, { useEffect, useState } from 'react';
-import useUserStore from '../../configs/useUserStore';
 import { Button, Input } from 'antd';
 import styles from './index.module.scss';
 import api from '../../configs/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 const Profile = () => {
-  // const { user } = useUserStore();
-  // const [userDetails, setUserDetails] = useState([]);
-  // const [loading, setLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const fetchUserDetails = async () => {
-  //     try {
-  //       const res = await api.get(`/admin-manager/users/get-user/${user.id}`, {
-  //         requireAuth: true,
-  //       });
-  //       setUserDetails(res.data);
-  //     } catch (error) {
-  //       console.log('Error fetching user details:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const res = await api.get('/user/get-profile', {
+          requireAuth: true,
+        });
 
-  //   if (user.id) {
-  //     fetchUserDetails();
-  //   }
-  // }, [user.id]);
+        const userData = res.data;
+        let decodedAddress = 'N/A';
 
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-  // log('userDetails', userDetails);
+        if (userData.address) {
+          try {
+            const parsedAddress = JSON.parse(userData.address);
+            decodedAddress = `${parsedAddress.province}, ${parsedAddress.district}`;
+          } catch (error) {
+            decodedAddress = userData.address;
+          }
+        }
+
+        setUserDetails({
+          ...userData,
+          address: decodedAddress,
+        });
+      } catch (error) {
+        console.log('Error fetching user details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserDetails();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -41,11 +53,25 @@ const Profile = () => {
             <div className={styles.card}>
               <div className={styles.cardBody}>
                 <div className={styles.profileSection}>
-                  <img src="src\assets\adminAvt.png" alt="Admin Avatar" className={styles.profileImage} />
+                  <img
+                    src={userDetails.role === 'Admin' ? 'src/assets/adminAvt.png' : 'src/assets/staffAvt.png'}
+                    alt="Avatar"
+                    className={styles.profileImage}
+                  />
                   <div className={styles.profileInfo}>
-                    <h2>John Doe</h2>
-                    <p className={styles.textSecondary}>Full Stack Developer</p>
-                    <p className={styles.textSecondary}>Bay Area, San Francisco, CA</p>
+                    <h2>{userDetails.fullName}</h2>
+                    <p className={styles.textSecondary}>
+                      {userDetails.role === 'Admin' ? (
+                        <>
+                          <FontAwesomeIcon icon={faCheckCircle} className={styles.blueTick} /> Admin System
+                        </>
+                      ) : (
+                        <>
+                          <FontAwesomeIcon icon={faCheckCircle} className={styles.grayTick} /> Staff managemer
+                        </>
+                      )}
+                    </p>
+                    <p className={styles.textSecondary}>{userDetails.address}</p>
                     <div className={styles.btn}>
                       <Button type="primary" className={styles.followButton}>
                         Follow
@@ -56,11 +82,11 @@ const Profile = () => {
                 </div>
                 <hr className={styles.divider} />
                 <ul className={styles.listGroup}>
-                  <SocialLink icon="globe" title="Website" value="https://bootdey.com" />
-                  <SocialLink icon="github" title="Github" value="bootdey" />
-                  <SocialLink icon="twitter" title="Twitter" value="@bootdey" />
-                  <SocialLink icon="instagram" title="Instagram" value="bootdey" />
-                  <SocialLink icon="facebook" title="Facebook" value="bootdey" />
+                  <SocialLink icon="globe" title="Website" value="https://koiauction.com.vn" />
+                  <SocialLink icon="github" title="Github" value="@Git" />
+                  <SocialLink icon="twitter" title="Twitter" value="@Twt" />
+                  <SocialLink icon="instagram" title="Instagram" value="@Ins" />
+                  <SocialLink icon="facebook" title="Facebook" value="@Facebook" />
                 </ul>
               </div>
             </div>
@@ -68,11 +94,15 @@ const Profile = () => {
           <div className={styles.colLg8}>
             <div className={styles.card}>
               <div className={styles.cardBody}>
-                <FormField label="Full Name" value="Nguyen VAn AAAAAAA" />
-                <FormField label="Email" value="{userDetails.email}" />
-                <FormField label="Phone" value="(239) 816-9029" />
-                <FormField label="Role" value="Admin" />
-                <FormField label="Address" value="Bay Area, San Francisco, CA" />
+                <FormField label="Full Name" value={userDetails.fullName} />
+                <FormField label="Email" value={userDetails.email} />
+                <FormField label="Username" value={userDetails.userName} />
+                <FormField label="Phone" value={userDetails.phoneNumber} />
+                <FormField label="Role" value={userDetails.role} />
+                <FormField
+                  label="Create At"
+                  value={userDetails.createAt ? new Date(userDetails.createAt).toLocaleString() : 'N/A'}
+                />
                 <div className={styles.row}>
                   <Button type="primary" className={styles.saveButton}>
                     Save Changes
@@ -166,15 +196,9 @@ const getIconPath = (icon) => {
         <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
       );
     case 'instagram':
-      return (
-        <>
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-        </>
-      );
+      return <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>;
     case 'facebook':
-      return <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>;
+      return <path d="M18 2h-3a4 4 0 0 0-4 4v3H8v4h3v8h4v-8h3l1-4h-4V6a1 1 0 0 1 1-1h3z"></path>;
     default:
       return null;
   }

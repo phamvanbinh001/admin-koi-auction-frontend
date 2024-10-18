@@ -4,7 +4,6 @@ import api from '../../configs/api';
 import useUserStore from '../../configs/useUserStore';
 import ConfirmPopup from '../../components/Popup/ConfirmPopup';
 import RoleUpdateModal from '../../components/Modal/RoleUpdateModal';
-import { format } from 'date-fns';
 
 const User = () => {
   const [users, setUsers] = useState([]);
@@ -141,14 +140,14 @@ const User = () => {
       dataIndex: 'createAt',
       key: 'createAt',
       align: 'center',
-      render: (text, record) => format(new Date(record.createAt), 'dd/MM/yyyy HH:mm:ss'),
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: 'Update At',
       dataIndex: 'updateAt',
       key: 'updateAt',
       align: 'center',
-      render: (text, record) => format(new Date(record.updateAt), 'dd/MM/yyyy HH:mm:ss'),
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: 'Role',
