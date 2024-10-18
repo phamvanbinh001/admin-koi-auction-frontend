@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Table, Spin, Button, Input, DatePicker, Space, Select, Slider, Flex } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import api from '../../configs/api';
-import axios from 'axios';
-import { format } from 'date-fns';
 import * as XLSX from 'xlsx';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -18,20 +16,18 @@ const TransactionManagement = () => {
     amountRange: [0, 10000],
     paymentMethod: null,
     userID: null,
-    walletID: null,
   });
 
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);
       try {
-        const response = await api.get('/wallet/transactions', {
+        const response = await api.get('/admin/transaction', {
           requireAuth: true,
         });
 
         setTransactions(response.data);
         setFilteredTransactions(response.data);
-        calculateTotalAmount(response.data);
       } catch (error) {
         console.error('Error fetching transactions:', error);
       } finally {
@@ -42,10 +38,20 @@ const TransactionManagement = () => {
     fetchTransactions();
   }, []);
 
-  const calculateTotalAmount = (data) => {
-    const total = data.reduce((acc, transaction) => acc + transaction.walletID.amount, 0);
-    setTotalAmount(total);
-  };
+  useEffect(() => {
+    const fetchTotalAmount = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get('/admin/total-balance', { requireAuth: true });
+        setTotalAmount(res.data);
+      } catch (error) {
+        console.error('Error fetching total amount:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTotalAmount();
+  }, []);
 
   // Tự động lọc theo khi thay đổi bộ lọc
   useEffect(() => {
@@ -75,15 +81,11 @@ const TransactionManagement = () => {
       filtered = filtered.filter((transaction) => transaction.amount >= minAmount && transaction.amount <= maxAmount);
     }
 
-    if (filters.userID) {
-      filtered = filtered.filter((transaction) => transaction.walletID.userID === filters.userID);
-    }
-
     if (filters.walletID) {
       filtered = filtered.filter((transaction) => transaction.walletID.id === filters.walletID);
     }
 
-    if (filters.paymentMethod) {
+    if (filters.paymentMethod !== '') {
       filtered = filtered.filter((transaction) => transaction.transactionType === filters.paymentMethod);
     }
 
@@ -100,12 +102,11 @@ const TransactionManagement = () => {
   const columns = [
     { title: 'Transaction ID', dataIndex: 'id' },
     { title: 'Wallet ID', dataIndex: ['walletID', 'id'] },
-    { title: 'User ID', dataIndex: ['walletID', 'userID'] },
     { title: 'Transaction Amount', dataIndex: 'amount' },
     {
       title: 'Transaction Time',
       dataIndex: 'time',
-      render: (text) => format(new Date(text), 'dd/MM/yyyy HH:mm:ss'),
+      render: (text) => new Date(text).toLocaleString(),
     },
     { title: 'Auction ID', dataIndex: 'auctionID' },
     { title: 'Status', dataIndex: 'status' },
@@ -119,38 +120,33 @@ const TransactionManagement = () => {
       {/* Khu vực filter */}
       <Space style={{ marginBottom: 20 }}>
         {/* Lọc theo khoảng thời gian */}
-        <RangePicker
-          onChange={(dates) => handleFilterChange('dateRange', dates)}
-          format="DD/MM/YYYY" // Sửa để hiển thị cả năm
-        />
+        <RangePicker onChange={(dates) => handleFilterChange('dateRange', dates)} format="DD/MM/YYYY" />
 
         {/* Lọc theo khoảng số tiền */}
         <Slider
           range
           defaultValue={filters.amountRange}
           min={0}
-          max={100000}
+          max={1000000000000}
           step={1000}
           onChange={(value) => handleFilterChange('amountRange', value)}
           style={{ width: 200 }}
         />
-
-        {/* Lọc theo User ID */}
-        <Input placeholder="User ID" onChange={(e) => handleFilterChange('userID', parseInt(e.target.value))} />
 
         {/* Lọc theo Wallet ID */}
         <Input placeholder="Wallet ID" onChange={(e) => handleFilterChange('walletID', parseInt(e.target.value))} />
 
         {/* Lọc theo Transaction Type (Phương thức thanh toán) */}
         <Select placeholder="Transaction Type" onChange={(value) => handleFilterChange('paymentMethod', value)}>
-          <Option value="Cash">Cash</Option>
-          <Option value="QR">QR</Option>
-          <Option value="Bank Transfer">Bank Transfer</Option>
+          <Option value="">All</Option>
+          <Option value="Top-up">Top up</Option>
+          <Option value="Payment">Payment</Option>
+          <Option value="Deposit">Deposit</Option>
         </Select>
       </Space>
 
-      <Flex gap="small" align="flex-end" vertical onClick={exportToExcel} style={{ marginBottom: '20px' }}>
-        <Flex gap="small" wrap>
+      <Flex gap="small" align="flex-end" vertical style={{ marginBottom: '20px' }}>
+        <Flex gap="small" onClick={exportToExcel} wrap>
           <Button type="primary" icon={<DownloadOutlined />} size={'middle'}>
             Export to Excel
           </Button>

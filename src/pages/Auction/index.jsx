@@ -18,15 +18,14 @@ const Auction = () => {
   const fetchData = async (page = 1, size = 10) => {
     setLoading(true);
     try {
-      const response = await api.get('auction/admin/get-all', {
+      const response = await api.get('auction/admin', {
         requireAuth: true,
         params: {
           page,
           size,
         },
       });
-
-      setAuctions(response.data.content); // Cập nhật dữ liệu auction
+      setAuctions(response.data.auction); // Cập nhật dữ liệu auction
       setTotalElements(response.data.totalElements); // Cập nhật tổng số phần tử để hiển thị pagination
     } catch (error) {
       console.error('Failed to fetch auction data', error);
@@ -39,6 +38,7 @@ const Auction = () => {
   useEffect(() => {
     fetchData(currentPage, pageSize);
   }, [currentPage, pageSize]); // Fetch lại dữ liệu khi trang hoặc kích thước trang thay đổi
+  console.log(auctions);
 
   // handle null value to uppercase
   const toUpperCase2 = (value) => {

@@ -1,126 +1,162 @@
-import React, { useState } from 'react';
-import { Popover, Spin, Avatar, Button } from 'antd';
-import { StarFilled } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Table, Modal, Button, Space, Pagination, Input, Popover, message } from 'antd';
 import api from '../../configs/api';
+import UserPopover from '../../components/Popover/UserPopover';
+import FishPopover from '../../components/Popover/FishPopover';
 
-const UserPopover = ({ userId, children }) => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(false);
+const Request = ({ userId }) => {
+  const [auctionRequests, setAuctionRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [approvalComments, setApprovalComments] = useState({}); // Lưu comment cho từng auction
 
-  const fetchUserData = async () => {
-    if (!userData) {
+  // Hàm fetch data với tham số page
+  const fetchData = async (page = 0, size = 10) => {
+    try {
       setLoading(true);
-      try {
-        // const response = await axios.get(
-        //   `https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/api/admin-manager/users/get-user/${userId}`,
-        // );
-
-        const response = await api.get(`admin-manager/users/get-user/${userId}`, {
-          requireAuth: true,
-        });
-        setUserData(response.data);
-      } catch (error) {
-        setUserData('Failed to fetch user data');
-        console.error('Failed to fetch user data', error);
-      } finally {
-        setLoading(false);
-      }
+      const response = await api.get('/auction/staff/get-auction-request', {
+        requireAuth: true,
+        params: {
+          page,
+          size,
+        },
+      });
+      setAuctionRequests(response.data.content);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error('Failed to fetch data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const renderStars = (role) => {
-    let starCount = 0;
-    switch (role) {
-      case 'Staff':
-        starCount = 3;
-        break;
-      case 'Admin':
-        starCount = 5;
-        break;
-      case 'Breeder':
-        starCount = 1;
-        break;
-      default:
-        starCount = 0;
-        break;
-    }
-    return (
-      <div>
-        {[...Array(starCount)].map((_, index) => (
-          <StarFilled key={index} style={{ color: 'gold', fontSize: '16px', marginRight: '2px' }} />
-        ))}
-      </div>
-    );
-  };
+  useEffect(() => {
+    fetchData(currentPage);
+  }, [currentPage]);
 
-  const srcAvatar = (role) => {
-    switch (role) {
-      case 'Admin':
-        return 'src/assets/adminAvt.png';
-      case 'Staff':
-        return 'src/assets/staffAvt.png';
-      case 'Breeder':
-        return 'src/assets/breederAvt.png';
-      default:
-        return 'src/assets/defaultAvt.png';
+  // Hàm xử lý duyệt/từ chối auction
+  const handleApproveOrReject = async (auctionId, status) => {
+    const comment = approvalComments[auctionId] || '';
+    if (!comment) {
+      message.warning('Please provide a reason for approval/rejection.');
+      return;
+    }
+
+    try {
+      const response = await api.post(`/auction/staff/update-auction-status`, {
+        auctionId,
+        staffId: userId,
+        status,
+        comment,
+      });
+      message.success('Auction status updated successfully');
+      fetchData(currentPage); // Tải lại dữ liệu sau khi duyệt
+    } catch (error) {
+      console.error('Failed to update auction status', error);
+      message.error('Failed to update auction status');
     }
   };
 
-  const content = userData ? (
-    <div
-      style={{
-        minWidth: '300px',
-        padding: '10px',
-        backgroundColor: '#282c34',
-        color: 'white',
-        borderRadius: '10px',
-        boxShadow: '0 2px 8px rgbYa(0, 0, 0, 0.15)',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-        <Avatar src={srcAvatar(userData.role)} size={64} style={{ marginRight: '10px', border: '2px solid #1890ff' }} />
-        <div>
-          <h3 style={{ color: 'white', margin: 0 }}>{userData.fullName}</h3>
-          {renderStars(userData.role)} {/* Hiển thị sao dựa trên vai trò */}
-        </div>
-      </div>
-      <p style={{ margin: 0 }}>
-        <b>Email:</b> {userData.email}
-      </p>
-      <p style={{ margin: 0 }}>
-        <b>Phone:</b> {userData.phoneNumber}
-      </p>
-      <p style={{ margin: 0 }}>
-        <b>Role:</b> {userData.role}
-      </p>
-      <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
-        <Button type="primary" style={{ flex: 1, marginRight: '5px' }}>
-          Chat
-        </Button>
-        <Button type="default" style={{ flex: 1 }}>
-          Mail
-        </Button>
-      </div>
-    </div>
-  ) : (
-    'No data available'
-  );
+  // Hàm thay đổi trang
+  const handlePageChange = (page) => {
+    setCurrentPage(page - 1);
+  };
+
+  const handleCommentChange = (auctionId, comment) => {
+    setApprovalComments({
+      ...approvalComments,
+      [auctionId]: comment,
+    });
+  };
+
+  const columns = [
+    {
+      title: 'Auction ID',
+      dataIndex: ['auction', 'id'],
+      key: 'auctionId',
+      render: (text, record) => text,
+    },
+    {
+      title: 'Koi ID',
+      dataIndex: 'koiFish',
+      key: 'koiFish',
+      render: (koiFish) => (
+        <FishPopover fishIds={koiFish}>
+          <Button type="link">View Koi</Button>
+        </FishPopover>
+      ),
+    },
+    {
+      title: 'Starting Price',
+      dataIndex: ['auction', 'startingPrice'],
+      key: 'startingPrice',
+    },
+    {
+      title: 'Buy Now Price',
+      dataIndex: ['auction', 'buyoutPrice'],
+      key: 'buyoutPrice',
+    },
+    {
+      title: 'Start Time',
+      dataIndex: ['auction', 'startTime'],
+      key: 'startTime',
+      render: (text) => new Date(text).toLocaleString(),
+    },
+    {
+      title: 'End Time',
+      dataIndex: ['auction', 'endTime'],
+      key: 'endTime',
+      render: (text) => new Date(text).toLocaleString(),
+    },
+    {
+      title: 'Owner',
+      dataIndex: ['auction', 'breederID'],
+      key: 'breederID',
+      render: (text) => (
+        <UserPopover userId={text}>
+          <Button type="link">View Owner</Button>
+        </UserPopover>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text, record) => (
+        <Space direction="vertical">
+          <Input
+            placeholder="Enter comment"
+            value={approvalComments[record.auction.id] || ''}
+            onChange={(e) => handleCommentChange(record.auction.id, e.target.value)}
+          />
+          <Space>
+            <Button type="primary" onClick={() => handleApproveOrReject(record.auction.id, 'approve')}>
+              Approve
+            </Button>
+            <Button danger onClick={() => handleApproveOrReject(record.auction.id, 'reject')}>
+              Reject
+            </Button>
+          </Space>
+        </Space>
+      ),
+    },
+  ];
 
   return (
-    <Popover
-      content={content}
-      title="User Details"
-      trigger="hover"
-      placement="right"
-      onClick={fetchUserData}
-      overlayStyle={{ maxWidth: '400px' }}
-    >
-      <span style={{ cursor: 'pointer' }} onMouseEnter={fetchUserData}>
-        {/* {children || 'User Details'} */}
-        {children || <Avatar src="src/assets/defaultAvt.png" />}
-      </span>
-    </Popover>
+    <>
+      <Table
+        columns={columns}
+        dataSource={auctionRequests}
+        loading={loading}
+        rowKey={(record) => record.auction.id}
+        pagination={false}
+      />
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+        <Pagination current={currentPage + 1} total={totalPages * 10} pageSize={10} onChange={handlePageChange} />
+      </div>
+    </>
   );
 };
 
-export default UserPopover;
+export default Request;
