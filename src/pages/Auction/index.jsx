@@ -12,9 +12,8 @@ const Auction = () => {
   const [loading, setLoading] = useState(true);
   const [totalElements, setTotalElements] = useState(0); // Để quản lý tổng số phần tử
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const [pageSize, setPageSize] = useState(10); // Số phần tử trên mỗi trang
+  const [pageSize, setPageSize] = useState(10);
 
-  // Hàm để fetch dữ liệu auction
   const fetchData = async (page = 1, size = 10) => {
     setLoading(true);
     try {
@@ -34,7 +33,6 @@ const Auction = () => {
     }
   };
 
-  // useEffect để fetch dữ liệu khi component render lần đầu tiên
   useEffect(() => {
     fetchData(currentPage, pageSize);
   }, [currentPage, pageSize]); // Fetch lại dữ liệu khi trang hoặc kích thước trang thay đổi

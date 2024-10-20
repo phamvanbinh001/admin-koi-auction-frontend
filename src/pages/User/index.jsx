@@ -3,7 +3,7 @@ import { Table, Button, notification } from 'antd';
 import api from '../../configs/api';
 import useUserStore from '../../configs/useUserStore';
 import ConfirmPopup from '../../components/Popup/ConfirmPopup';
-import RoleUpdateModal from '../../components/Modal/RoleUpdateModal';
+import RoleUpdate from '../../components/Modal/RoleUpdate';
 
 const User = () => {
   const [users, setUsers] = useState([]);
@@ -190,7 +190,7 @@ const User = () => {
     <div>
       <h2>User Manager</h2>
       <Table dataSource={users} columns={columns} rowKey="id" />
-      <RoleUpdateModal
+      <RoleUpdate
         visible={isModalVisible}
         currentRole={currentRole}
         newRole={newRole}
