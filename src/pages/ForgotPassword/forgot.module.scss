@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.form {
+  width: 600px;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid red;
+}
+
+h2 {
+  text-align: center;
+  padding: 10px;
+  border-radius: 3px;
+  flex-grow: 1;
+  margin: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.loginBtn {
+  width: 100px;
+  margin-right: 3px;
+  height: 50px;
+  border: 2px solid red;
+  color: red;
+  cursor: pointer;
+  font-weight: bolder;
+}
+
+.countdown {
+  color: red;
+  font-size: 15px;
+  margin-left: 10px;
+}

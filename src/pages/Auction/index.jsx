@@ -4,7 +4,6 @@ import { DownloadOutlined } from '@ant-design/icons';
 import UserPopover from '../../components/Popover/UserPopover';
 import api from '../../configs/api';
 import * as XLSX from 'xlsx';
-import { format } from 'date-fns';
 import FishPopover from '../../components/Popover/FishPopover';
 
 const Auction = () => {
@@ -18,12 +17,14 @@ const Auction = () => {
     setLoading(true);
     try {
       const response = await api.get('auction/admin', {
-        requireAuth: true,
+        // requireAuth: true,
         params: {
           page,
           size,
         },
       });
+      console.log('Auction data: ', response.data);
+
       setAuctions(response.data.auction); // Cập nhật dữ liệu auction
       setTotalElements(response.data.totalElements); // Cập nhật tổng số phần tử để hiển thị pagination
     } catch (error) {
@@ -36,7 +37,7 @@ const Auction = () => {
   useEffect(() => {
     fetchData(currentPage, pageSize);
   }, [currentPage, pageSize]); // Fetch lại dữ liệu khi trang hoặc kích thước trang thay đổi
-  console.log(auctions);
+  // console.log(auctions);
 
   // handle null value to uppercase
   const toUpperCase2 = (value) => {
@@ -69,19 +70,15 @@ const Auction = () => {
     {
       title: 'Start Time',
       dataIndex: ['auction', 'startTime'],
-      render: (text, record) => {
-        return record.auction && record.auction.startTime
-          ? format(new Date(record.auction.startTime), 'dd/MM/yyyy HH:mm:ss')
-          : 'N/A';
+      render: (text) => {
+        return text ? new Date(text).toLocaleString() : 'N/A';
       },
     },
     {
       title: 'Estimated End Time',
       dataIndex: ['auction', 'endTime'],
-      render: (text, record) => {
-        return record.auction && record.auction.endTime
-          ? format(new Date(record.auction.endTime), 'dd/MM/yyyy HH:mm:ss')
-          : 'N/A';
+      render: (text) => {
+        return text ? new Date(text).toLocaleString() : 'N/A';
       },
     },
     {

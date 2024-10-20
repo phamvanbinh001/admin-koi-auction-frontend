@@ -81,7 +81,7 @@ const Login = () => {
             </Form.Item>
           </Form>
 
-          <a className="forgot-password" href="/forgot-password">
+          <a className="forgotPassword" href="/forgotPassword">
             Forgot password?
           </a>
         </div>
