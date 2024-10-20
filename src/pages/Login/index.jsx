@@ -7,6 +7,8 @@ import './Login.css';
 import Logo from '../../components/Logo';
 
 const Login = () => {
+  const koiImg =
+    'https://firebasestorage.googleapis.com/v0/b/koi-auction-backend.appspot.com/o/shortVideo.mp4?alt=media&token=d9603a4e-40f5-4e02-b32e-ea06e652625e';
   console.log('Login');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -84,7 +86,7 @@ const Login = () => {
           </a>
         </div>
         <div className="login-banner">
-          <video src="src\assets\tienca.mp4" autoPlay loop muted></video>
+          <video src={koiImg} autoPlay loop muted></video>
         </div>
       </div>
     </div>

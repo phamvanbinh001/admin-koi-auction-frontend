@@ -3,14 +3,11 @@ import { Table, Modal, Button, Space, Pagination } from 'antd';
 import api from '../../configs/api';
 import FishPopover from '../../components/Popover/FishPopover';
 import UserPopover from '../../components/Popover/UserPopover';
+import ApproveAuction from '../../components/Modal/ApproveAuction';
 
 const Request = () => {
   const [auctionRequests, setAuctionRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedKoi, setSelectedKoi] = useState(null);
-  const [selectedOwner, setSelectedOwner] = useState(null);
-  const [isKoiModalOpen, setIsKoiModalOpen] = useState(false);
-  const [isOwnerModalOpen, setIsOwnerModalOpen] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [currentAuction, setCurrentAuction] = useState(null);
   const [currentPage, setCurrentPage] = useState(0); // Mặc định trang đầu là 0
@@ -37,6 +34,8 @@ const Request = () => {
   };
 
   useEffect(() => {
+    // console.log('render currentPage: ', currentPage + 1);
+
     fetchData(currentPage); // Gọi fetchData khi component load với trang hiện tại là 0
   }, [currentPage]);
 
@@ -45,11 +44,6 @@ const Request = () => {
 
     setCurrentPage(page - 1); // Chuyển trang, nhưng trừ đi 1 để đúng với API bắt đầu từ 0
     fetchData(page - 1);
-  };
-
-  const handleOwnerClick = (record) => {
-    setSelectedOwner(record.auction.breederID);
-    setIsOwnerModalOpen(true);
   };
 
   const handleActionClick = (auction) => {
@@ -74,10 +68,21 @@ const Request = () => {
       key: 'auctionId',
     },
     {
-      title: 'Koi ID',
-      dataIndex: 'koiFish',
+      title: 'Koi',
       key: 'koiFish',
-      render: (koiFish) => koiFish.join(', '),
+      render: (text, record) => {
+        return (
+          <>
+            <b>
+              {record.koiFish && record.koiFish.length > 0 ? (
+                <FishPopover fishIds={record.koiFish}>Click here</FishPopover>
+              ) : (
+                'No Fish Data'
+              )}
+            </b>
+          </>
+        );
+      },
     },
     {
       title: 'Starting Price',
@@ -112,14 +117,10 @@ const Request = () => {
       render: (text) => new Date(text).toLocaleString(),
     },
     {
-      title: 'Owner',
+      title: 'Breeder',
       dataIndex: ['auction', 'breederID'],
       key: 'breederID',
-      render: (text, record) => (
-        <Button type="link" onClick={() => handleOwnerClick(record)}>
-          Breeder {text}
-        </Button>
-      ),
+      render: (text) => <UserPopover userId={text} />,
     },
     {
       title: 'Action',
@@ -144,58 +145,6 @@ const Request = () => {
         pagination={false} // Tắt phân trang của Ant Design, dùng Pagination riêng
       />
 
-      {/* Koi Details Modal */}
-      <Modal title="Koi Details" open={isKoiModalOpen} onCancel={() => setIsKoiModalOpen(false)} footer={null}>
-        {selectedKoi && (
-          <div>
-            <p>
-              <strong>Koi Fish IDs:</strong> {selectedKoi.join(', ')}
-            </p>
-          </div>
-        )}
-      </Modal>
-
-      {/* Owner Details Modal */}
-      <Modal title="Owner Details" open={isOwnerModalOpen} onCancel={() => setIsOwnerModalOpen(false)} footer={null}>
-        {selectedOwner && (
-          <div>
-            <p>
-              <strong>Breeder ID:</strong> {selectedOwner}
-            </p>
-          </div>
-        )}
-      </Modal>
-
-      {/* Approve/Reject Action Modal */}
-      <Modal
-        title="Approve/Reject Auction"
-        open={isActionModalOpen}
-        onCancel={() => setIsActionModalOpen(false)}
-        footer={[
-          <Button key="reject" type="danger" onClick={handleReject}>
-            Reject
-          </Button>,
-          <Button key="approve" type="primary" onClick={handleApprove}>
-            Approve
-          </Button>,
-        ]}
-      >
-        {currentAuction && (
-          <div>
-            <p>
-              <strong>ID of Koi:</strong> {currentAuction.auction.id}
-            </p>
-            <p>
-              <strong>Starting Price:</strong> {currentAuction.auction.startingPrice}
-            </p>
-            <p>
-              <strong>Buy Now Price:</strong> {currentAuction.auction.buyoutPrice}
-            </p>
-            <p>Do you want to approve or reject this auction request?</p>
-          </div>
-        )}
-      </Modal>
-
       {/* Pagination */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
         {' '}
@@ -207,6 +156,14 @@ const Request = () => {
           onChange={handlePageChange} // Gọi hàm khi chuyển trang
         />
       </div>
+
+      <ApproveAuction
+        visible={isActionModalOpen}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        onCancel={() => setIsActionModalOpen(false)}
+        auction={currentAuction}
+      />
     </>
   );
 };

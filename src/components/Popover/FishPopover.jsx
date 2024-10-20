@@ -95,7 +95,7 @@ const FishPopover = ({ fishIds, children }) => {
         </div>
       )}
 
-      {/* Hiển thị hình ảnh hoặc video của Koi */}
+      {/* images */}
       {fishData[currentIndex].mediaList?.[0]?.url ? (
         <div style={{ marginBottom: '0' }}>
           <img

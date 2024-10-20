@@ -11,61 +11,48 @@ const api = axios.create({
     },
 });
 
-
+// Interceptor cho request
 api.interceptors.request.use(
     (config) => {
         const { user } = useUserStore.getState();
-        // console.log('current user:', user);
-
         const token = user.token;
-        if (config.requireAuth && token) {
+
+        if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-        }
-        else if (config.requireAuth && !token) {
+        } else {
             console.error('Token not available!');
         }
+
         return config;
     },
     (error) => {
         return Promise.reject(error);
-    },
+    }
 );
 
-// api.interceptors.response.use(
-//     (response) => {
-//         return response;
-//     },
-//     (error) => {
-//         if (error.response && error.response.status === 401) {
-//             console.log(error.response.message);
-//             console.error('Unauthorized!');
-//             if (error.config.onUnauthorizedCallback) {
-//                 error.config.onUnauthorizedCallback();
-//             }
-//         }
-//         return Promise.reject(error);
-//     },
-// );
+// Interceptor cho response để xử lý lỗi 401
+api.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            console.error('Unauthorized!');
+
+            // Kiểm tra xem có phải lỗi khi login không
+            if (error.config.url.includes('/login')) {
+                console.error('Login failed, wrong credentials!');
+            } else {
+                console.error('Unauthorized! Redirecting to login...');
+
+                // Chuyển hướng tới trang đăng nhập nếu cần
+                if (error.config.onUnauthorizedCallback) {
+                    error.config.onUnauthorizedCallback();
+                }
+            }
+        }
+        return Promise.reject(error);
+    }
+);
 
 export default api;
-
-// api.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   (error) => {
-//     if (error.response && error.response.status === 401) {
-
-//       if (error.config.url.includes('/login')) {
-//         console.error('Sai mật khẩu!');
-//         /////........................
-//       } else {
-//         console.error('Unauthorized! Redirecting to login...');
-//         if (error.config.onUnauthorizedCallback) {
-//           error.config.onUnauthorizedCallback();
-//         }
-//       }
-//     }
-//     return Promise.reject(error);
-//   },
-// );

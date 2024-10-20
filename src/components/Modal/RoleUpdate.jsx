@@ -3,7 +3,7 @@ import { Modal, Select, Button } from 'antd';
 
 const { Option } = Select;
 
-const RoleUpdateModal = ({ visible, currentRole, newRole, setNewRole, onSubmit, onCancel }) => {
+const RoleUpdate = ({ visible, currentRole, newRole, setNewRole, onSubmit, onCancel }) => {
   return (
     <Modal
       title="Update Role"
@@ -35,4 +35,4 @@ const RoleUpdateModal = ({ visible, currentRole, newRole, setNewRole, onSubmit, 
   );
 };
 
-export default RoleUpdateModal;
+export default RoleUpdate;
