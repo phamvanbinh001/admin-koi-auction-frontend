@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.form {
+  padding: 20px;
+  border-radius: 8px; // Optional: Rounded corners
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); // Optional: Box shadow for depth
+  width: 600px; // Fixed width for the form
+  border: 2px solid red; // Red border for the form
+}
+
+h2 {
+  color: white; // White text for the heading
+  text-align: center; // Center align the heading
+  background-color: red; // Red background for the heading
+  padding: 10px; // Padding for spacing
+  border-radius: 3px; // Optional: Rounded corners for the heading
+}
+
+.ant-form {
+  padding: 20px; // Add padding for spacing inside the form
+}
+
+p {
+  color: red; // Red text for messages
+  text-align: center; // Center align the message
+}
