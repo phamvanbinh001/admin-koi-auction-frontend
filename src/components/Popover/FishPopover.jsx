@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Popover, List, Spin, Button } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import api from '../../configs/api';
+import styles from './index.module.scss';
 
 const defaultImage = 'src/assets/defaultKoi.jpg';
 
@@ -16,10 +17,8 @@ const FishPopover = ({ fishIds, children }) => {
       try {
         const fishDetails = await Promise.all(
           fishIds.map(async (fishId) => {
-            const response = await axios.get(
-              `https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/api/koi-fish/${fishId}`,
-            );
-            return response.data;
+            const res = await api.get(`/koi-fish/${fishId}`);
+            return res.data;
           }),
         );
         setFishData(fishDetails);
@@ -45,97 +44,37 @@ const FishPopover = ({ fishIds, children }) => {
   };
 
   const content = fishData ? (
-    <div
-      style={{
-        minWidth: '400px',
-        padding: '20px',
-        backgroundColor: '#f9f9f9',
-        color: '#333',
-        borderRadius: '10px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        position: 'relative',
-        textAlign: 'center',
-      }}
-    >
+    <div className={styles.fishPopoverContent}>
       {fishData.length > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+        <div className={styles.navigationButtons}>
           <Button
             icon={<LeftOutlined />}
             onClick={handlePrevFish}
             disabled={currentIndex === 0}
-            style={{
-              backgroundColor: '#808080',
-              border: '2px solid #d9d9d9',
-              borderRadius: '5px',
-              width: '30px',
-              height: '30px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fontSize: '18px',
-            }}
+            className={styles.button}
           />
           <Button
             icon={<RightOutlined />}
             onClick={handleNextFish}
             disabled={currentIndex === fishData.length - 1}
-            style={{
-              backgroundColor: '#808080',
-              color: '#fff',
-              border: '2px solid #d9d9d9',
-              borderRadius: '5px',
-              width: '30px',
-              height: '30px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fontSize: '18px',
-            }}
+            className={`${styles.button} ${styles.buttonRight}`}
           />
         </div>
       )}
 
       {/* images */}
       {fishData[currentIndex].mediaList?.[0]?.url ? (
-        <div style={{ marginBottom: '0' }}>
+        <div className={styles.imageContainer}>
           <img
             src={fishData[currentIndex].mediaList[0].url}
             alt={fishData[currentIndex].koiName}
-            style={{
-              maxWidth: '100%',
-              maxHeight: '300px',
-              objectFit: 'cover',
-              borderRadius: '10px',
-              border: '2px solid #1890ff',
-            }}
+            className={styles.image}
             onError={(e) => (e.target.src = defaultImage)} // Thay đổi ảnh lỗi thành ảnh mặc định
           />
         </div>
       ) : (
-        <div
-          style={{
-            width: '100%',
-            height: '300px',
-            backgroundColor: '#e0e0e0',
-            borderRadius: '10px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: '18px',
-            color: '#999',
-          }}
-        >
-          <img
-            src={defaultImage}
-            alt="default koi"
-            style={{
-              maxWidth: '100%',
-              maxHeight: '300px',
-              objectFit: 'cover',
-              borderRadius: '10px',
-              border: '2px solid #1890ff',
-            }}
-          />
+        <div className={styles.defaultImageContainer}>
+          <img src={defaultImage} alt="default koi" className={styles.image} />
         </div>
       )}
 
@@ -143,7 +82,7 @@ const FishPopover = ({ fishIds, children }) => {
         <List.Item.Meta
           title={<b>{fishData[currentIndex].koiName || 'Unknown Name'}</b>}
           description={
-            <div style={{ textAlign: 'left' }}>
+            <div className={styles.listDescription}>
               <p>
                 <b>ID:</b> {fishData[currentIndex].koiId}
               </p>
@@ -182,7 +121,7 @@ const FishPopover = ({ fishIds, children }) => {
       placement="right"
       trigger="click"
       overlayStyle={{ maxWidth: '400px' }}
-      onClick={fetchFishData} // Lấy dữ liệu khi nhấn
+      onClick={fetchFishData}
     >
       <span style={{ cursor: 'pointer' }}>{children}</span>
     </Popover>
