@@ -6,6 +6,8 @@ import CountDown from '../../components/Modal/CountDown';
 import styles from './forgot.module.scss';
 
 const ForgotPassword = () => {
+  console.log('Render ForgotPassword');
+
   const [email, setEmail] = useState('');
   const [isTokenFieldVisible, setIsTokenFieldVisible] = useState(false);
   const [tokenExpiryTime, setTokenExpiryTime] = useState(59);

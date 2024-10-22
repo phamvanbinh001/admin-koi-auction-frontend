@@ -21,9 +21,7 @@ const addressApi = axios.create({
     Accept: 'application/json',
   },
 });
-// console.log(addressURL);
 
-// Interceptor cho request
 api.interceptors.request.use(
   (config) => {
     const { user } = useUserStore.getState();
@@ -43,29 +41,29 @@ api.interceptors.request.use(
 );
 
 // Interceptor cho response để xử lý lỗi 401
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      console.error('Unauthorized!');
+// api.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   (error) => {
+//     if (error.response && error.response.status === 401) {
+//       console.error('Unauthorized!');
 
-      // Kiểm tra xem có phải lỗi khi login không
-      if (error.config.url.includes('/login')) {
-        console.error('Login failed, wrong credentials!');
-      } else {
-        console.error('Unauthorized! Redirecting to login...');
+//       // Kiểm tra xem có phải lỗi khi login không
+//       if (error.config.url.includes('/login')) {
+//         console.error('Login failed, wrong credentials!');
+//       } else {
+//         console.error('Unauthorized! Redirecting to login...');
 
-        // Chuyển hướng tới trang đăng nhập nếu cần
-        if (error.config.onUnauthorizedCallback) {
-          error.config.onUnauthorizedCallback();
-        }
-      }
-    }
-    return Promise.reject(error);
-  },
-);
+//         // Chuyển hướng tới trang đăng nhập nếu cần
+//         if (error.config.onUnauthorizedCallback) {
+//           error.config.onUnauthorizedCallback();
+//         }
+//       }
+//     }
+//     return Promise.reject(error);
+//   },
+// );
 
 export default api;
 export { addressApi };

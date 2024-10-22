@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { Layout, Menu, Button } from 'antd';
+import { Layout, Menu, Button, ConfigProvider } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHome,
+  faHouse,
   faFolderOpen,
   faCogs,
   faSignOutAlt,
@@ -40,61 +40,71 @@ const SidebarComponent = React.memo(() => {
     () => [
       {
         key: '1',
-        icon: <FontAwesomeIcon icon={faHome} />,
+        icon: <FontAwesomeIcon icon={faHouse} />,
         label: <Link to="/">Dashboard</Link>,
+        className: styles.menuItem,
       },
       {
         key: 'sub1',
         icon: <FontAwesomeIcon icon={faListCheck} />,
         label: 'Management',
+        className: styles.subMenuItem,
         children: [
           {
             key: '2',
             label: <Link to="/request">Requests</Link>,
             icon: <FontAwesomeIcon icon={faListCheck} />,
+            className: styles.menuItem,
           },
           {
             key: '3',
             label: <Link to="/auction">Auctions</Link>,
             icon: <FontAwesomeIcon icon={faFileContract} />,
+            className: styles.menuItem,
           },
           role === 'Admin' && {
             key: '4',
             label: <Link to="/transaction">Transactions</Link>,
             icon: <FontAwesomeIcon icon={faWallet} />,
+            className: styles.menuItem,
           },
           role === 'Admin' && {
             key: '5',
             label: <Link to="/user">Users</Link>,
             icon: <FontAwesomeIcon icon={faUsers} />,
+            className: styles.menuItem,
           },
           {
             key: '1000',
             label: <Link to="/category">Category</Link>,
             icon: <FontAwesomeIcon icon={faFolderOpen} />,
+            className: styles.menuItem,
           },
-          //tránh việc render ra undefined
         ].filter(Boolean),
       },
       {
         key: 'sub2',
         icon: <FontAwesomeIcon icon={faHandshakeSimple} />,
         label: 'Services',
+        className: styles.subMenuItem,
         children: [
           {
             key: '6',
             label: <Link to="/chat">Chat</Link>,
             icon: <FontAwesomeIcon icon={faCommentDots} />,
+            className: styles.menuItem,
           },
           {
             key: '7',
             label: <Link to="/email">Email</Link>,
             icon: <FontAwesomeIcon icon={faEnvelope} />,
+            className: styles.menuItem,
           },
           {
             key: '8',
             label: <Link to="/blog">Blogs</Link>,
             icon: <FontAwesomeIcon icon={faBlog} />,
+            className: styles.menuItem,
           },
         ],
       },
@@ -102,12 +112,14 @@ const SidebarComponent = React.memo(() => {
         key: '9',
         icon: <FontAwesomeIcon icon={faCogs} />,
         label: 'Setting',
+        className: styles.menuItem,
       },
       {
         key: '10',
         icon: <FontAwesomeIcon icon={faSignOutAlt} />,
         label: 'Logout',
         onClick: handleLogout,
+        className: styles.menuItem,
       },
     ],
     [role],
@@ -121,7 +133,19 @@ const SidebarComponent = React.memo(() => {
         onClick={() => setCollapsed(!collapsed)}
         className={styles.collapseButton}
       />
-      <Menu mode="inline" className={styles.menu} items={items} />
+      <ConfigProvider
+        theme={{
+          components: {
+            Menu: {
+              itemBg: '#F5F5F5',
+              itemColor: 'var(--primary-color)',
+              subMenuItemBg: '#F5F5F5',
+            },
+          },
+        }}
+      >
+        <Menu mode="inline" className={styles.menu} items={items} />
+      </ConfigProvider>
     </Sider>
   );
 });

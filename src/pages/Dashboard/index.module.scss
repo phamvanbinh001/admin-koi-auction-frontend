@@ -5,18 +5,19 @@
 
 .summaryWrapper {
   display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 30px;
+  justify-content: space-around;
+  margin: 20px;
 }
 
 .summaryCard {
-  flex: 1;
+  flex: 1; /* Mỗi ô sẽ chiếm đều không gian */
   margin: 0 10px; /* Khoảng cách giữa các ô summary */
   padding: 20px;
   border: 2px solid #15253d;
   border-radius: 12px;
-  text-align: end;
-  background-color: #148cdb; /* Màu nền cho ô */
+  text-align: center; /* Căn giữa nội dung trong ô */
+  background-color: var(--primary-color);
+  color: #ffffff; /* Màu chữ trắng để nổi bật */
   box-shadow: 0 4px 10px rgba(36, 34, 34, 0.1); /* Đổ bóng nhẹ cho ô */
   transition: transform 0.3s; /* Hiệu ứng chuyển động khi hover */
 
@@ -28,7 +29,7 @@
 
 .chartWrapper {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Căn giữa giữa biểu đồ */
   margin-bottom: 30px;
 }
 
@@ -43,10 +44,10 @@
 }
 
 .chartBorderPie {
-  border: 2px solid #e0e0e0; /* Viền cho biểu đồ */
+  border: 2px solid #e0e0e0; /* Viền cho biểu đồ tròn */
   border-radius: 12px; /* Bo góc */
   padding: 15px; /* Khoảng cách bên trong */
-  width: 30%; /* Giảm chiều rộng của khối bao quanh biểu đồ tròn */
+  width: 30%; /* Chiếm 30% chiều rộng cho biểu đồ tròn */
   height: 250px; /* Chiều cao biểu đồ */
   margin-left: 15px; /* Giảm khoảng cách bên trái của biểu đồ tròn */
   background-color: #ffffff; /* Màu nền cho biểu đồ */

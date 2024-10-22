@@ -1,10 +1,7 @@
 @import 'normalize.css';
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
-
 :root {
-  --primary-color: #1a73e8; // Thêm màu chủ đạo
-  // --secondary-color: #ffffff; // Thêm màu phụ nếu cần
   --primary-color: rgb(212, 22, 60);
   --border-radius: 8px;
   --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);

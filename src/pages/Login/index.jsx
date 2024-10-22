@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Form, Divider, Input, Button, notification } from 'antd';
+import { Form, Input, Button, notification, ConfigProvider } from 'antd';
 import api from '../../configs/api';
 import { useNavigate } from 'react-router-dom';
 import useUserStore from '../../configs/useUserStore';
-import './Login.css';
+import styles from './index.module.scss';
 import Logo from '../../components/Logo';
 
 const Login = () => {
   const koiImg =
     'https://firebasestorage.googleapis.com/v0/b/koi-auction-backend.appspot.com/o/shortVideo.mp4?alt=media&token=d9603a4e-40f5-4e02-b32e-ea06e652625e';
-  console.log('Login');
+  console.log('Render Login');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useUserStore();
@@ -56,36 +56,34 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="login-form">
-          <div className="logo">
+    <div className={styles.loginContainer}>
+      <div className={styles.loginBox}>
+        <div className={styles.loginForm}>
+          <div className={styles.logo}>
             <Logo />
           </div>
-          <h1>Sign In Now</h1>
-          <p className="description">Enter your email address and password to access your account.</p>
-          <Divider orientation="left" plain style={{ color: 'gray' }}>
-            Manage system
-          </Divider>
+          <h1 className={styles.h1}>Sign In Now</h1>
+
+          <p className={styles.description}>Enter your email address and password to access your account.</p>
           <Form onFinish={onFinish}>
             <Form.Item name="userName" rules={[{ required: true, message: 'Please input your username or email!' }]}>
-              <Input placeholder="Enter email or username" />
+              <Input placeholder="Enter email or username" className={styles.input} />
             </Form.Item>
             <Form.Item name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
-              <Input.Password placeholder="Enter your password" />
+              <Input.Password placeholder="Enter your password" className={styles.input} />
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
+              <Button type="primary" htmlType="submit" loading={loading} className={styles.btn}>
                 Sign In
               </Button>
             </Form.Item>
           </Form>
 
-          <a className="forgotPassword" href="/forgotPassword">
+          <span className={styles.forgotPassword} onClick={() => navigate('/forgotPassword')}>
             Forgot password?
-          </a>
+          </span>
         </div>
-        <div className="login-banner">
+        <div className={styles.loginBanner}>
           <video src={koiImg} autoPlay loop muted></video>
         </div>
       </div>
