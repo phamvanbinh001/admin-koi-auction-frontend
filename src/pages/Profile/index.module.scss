@@ -35,90 +35,12 @@
   border-radius: 50%;
 }
 
-.followButton {
-  margin-right: 10px;
-}
-
-.messageButton {
-  background-color: transparent;
-  color: #1890ff;
-  border-color: #1890ff;
-
-  &:hover,
-  &:focus {
-    color: #40a9ff;
-    border-color: #40a9ff;
-  }
-}
-
 .saveButton {
   width: 100px;
 }
 
-.divider {
-  margin: 2rem 0;
-  border: 1;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.listGroupItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
-
 .textSecondary {
   color: #6c757d;
-}
-
-.feather {
-  width: 24px;
-  height: 24px;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-  margin-right: 0.5rem;
-}
-
-.projectStatus {
-  font-size: large;
-  margin-bottom: 1.25rem;
-}
-
-.progressContainer {
-  height: 5px;
-  background-color: #e9ecef;
-  border-radius: 0.25rem;
-  margin-bottom: 1rem;
-}
-
-.progressBar {
-  height: 100%;
-  border-radius: 0.5rem;
-}
-
-.bgPrimary {
-  background-color: #007bff;
-}
-
-.bgDanger {
-  background-color: #dc3545;
-}
-
-.bgSuccess {
-  background-color: #28a745;
-}
-
-.bgWarning {
-  background-color: #ffc107;
-}
-
-.bgInfo {
-  background-color: #17a2b8;
 }
 
 .row {
@@ -169,4 +91,21 @@
 
 .grayTick {
   font-size: 12px;
+}
+
+.profileInfo {
+  display: flex;
+  align-items: center;
+}
+
+.profileName {
+  font-size: 1.5rem;
+}
+
+.readOnlySection {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
