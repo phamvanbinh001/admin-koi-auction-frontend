@@ -13,17 +13,12 @@ const Auction = () => {
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
   const [pageSize, setPageSize] = useState(10);
 
-  const fetchData = async (page = 1, size = 10) => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const response = await api.get('auction/admin', {
-        // requireAuth: true,
-        params: {
-          page,
-          size,
-        },
+        requireAuth: true,
       });
-      console.log('Auction data: ', response.data);
 
       setAuctions(response.data.auction); // Cập nhật dữ liệu auction
       setTotalElements(response.data.totalElements); // Cập nhật tổng số phần tử để hiển thị pagination
@@ -37,7 +32,6 @@ const Auction = () => {
   useEffect(() => {
     fetchData(currentPage, pageSize);
   }, [currentPage, pageSize]); // Fetch lại dữ liệu khi trang hoặc kích thước trang thay đổi
-  // console.log(auctions);
 
   // handle null value to uppercase
   const toUpperCase2 = (value) => {
@@ -150,7 +144,6 @@ const Auction = () => {
   ];
 
   const exportToExcel = () => {
-    // Kiểm tra xem auctions có dữ liệu hay không
     if (!auctions || auctions.length === 0) {
       console.error('No auction data available to export');
       return;

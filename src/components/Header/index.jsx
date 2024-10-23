@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import Logo from '../Logo';
-import { Layout, Switch, Dropdown, Menu, Badge, Avatar } from 'antd';
+import { Layout, Switch, Dropdown, Menu, Badge, Button } from 'antd';
 import { BellFilled, GlobalOutlined } from '@ant-design/icons';
 import styles from './index.module.scss';
-import { Link } from 'react-router-dom';
+import useUserStore from '../../configs/useUserStore';
+import { useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
 
@@ -11,16 +12,29 @@ const HeaderComponent = React.memo(() => {
   console.log('render HeaderComponent');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationCount, setNotificationCount] = useState(5);
+  const { user } = useUserStore();
+  const navigate = useNavigate();
+
+  const fullName = user.fullname;
 
   const handleThemeChange = (checked) => {
     setIsDarkMode(checked);
   };
 
+  // Cập nhật theo API mới của Ant Design
   const languageMenu = (
-    <Menu>
-      <Menu.Item key="en">English</Menu.Item>
-      <Menu.Item key="vn">Tiếng Việt</Menu.Item>
-    </Menu>
+    <Menu
+      items={[
+        {
+          key: 'en',
+          label: 'English',
+        },
+        {
+          key: 'vn',
+          label: 'Tiếng Việt',
+        },
+      ]}
+    />
   );
 
   return (
@@ -37,16 +51,24 @@ const HeaderComponent = React.memo(() => {
             unCheckedChildren="Light"
             className={styles['dark-light-switch']}
           />
-          <Dropdown menu={languageMenu} trigger={['click']}>
-            <GlobalOutlined className={styles.language} />
+          <Dropdown overlay={languageMenu} trigger={['click']}>
+            <span className={styles.language}>
+              <GlobalOutlined />
+            </span>
           </Dropdown>
-          {/* <Badge count={notificationCount} overflowCount={99} className={styles.badge}> */}
-          <Badge count={100} overflowCount={99} className={styles.badge}>
-            <BellFilled className={styles.noti} />
-          </Badge>
-          <Link to="/profile">
-            <Avatar shape="square" size="large" />
-          </Link>
+
+          <div className={styles.noti}>
+            <Badge count={100} overflowCount={99} className={styles.badge} />
+            <BellFilled />
+          </div>
+          <Button
+            className={styles.user}
+            onClick={() => {
+              navigate('/Profile');
+            }}
+          >
+            {fullName}
+          </Button>
         </div>
       </div>
     </Header>
