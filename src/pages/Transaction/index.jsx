@@ -42,8 +42,15 @@ const TransactionManagement = () => {
     const fetchTotalAmount = async () => {
       setLoading(true);
       try {
-        const res = await api.get('/admin/total-balance', { requireAuth: true });
-        setTotalAmount(res.data);
+        const res = await api.get(
+          '/wallet/get-wallet',
+          //  { requireAuth: true }
+        );
+        console.log(res);
+        console.log(res.data);
+        console.log('Total amount:', res.data.amount);
+
+        setTotalAmount(res.data.amount);
       } catch (error) {
         console.error('Error fetching total amount:', error);
       } finally {

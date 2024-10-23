@@ -108,7 +108,7 @@ const Profile = () => {
       ...prevState,
       [name]: value,
     }));
-    setIsFormModified(true); // Đánh dấu form đã bị thay đổi
+    setIsFormModified(true);
   };
 
   const handleSaveChanges = async () => {

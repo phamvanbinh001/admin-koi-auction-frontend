@@ -4,7 +4,6 @@ import { Modal, Button } from 'antd';
 const ApproveAuction = ({ visible, onApprove, onReject, onCancel, auction }) => {
   return (
     <Modal
-      title="Approve / Reject Auction"
       open={visible}
       onCancel={onCancel}
       footer={[
@@ -19,7 +18,10 @@ const ApproveAuction = ({ visible, onApprove, onReject, onCancel, auction }) => 
       {auction ? (
         <div>
           <p>
-            <strong>ID of Koi Fish: </strong> {auction.auction.id}
+            <strong>Fish ID: </strong> {auction.auction.id}
+          </p>
+          <p>
+            <strong>Breeder ID:</strong> {auction.auction.breederID}
           </p>
           <p>
             <strong>Starting Price:</strong> {auction.auction.startingPrice}
@@ -27,7 +29,11 @@ const ApproveAuction = ({ visible, onApprove, onReject, onCancel, auction }) => 
           <p>
             <strong>Buy Now Price:</strong> {auction.auction.buyoutPrice}
           </p>
-          <p>Do you want to approve or reject this auction request?</p>
+          <p>
+            <strong>Bid Step:</strong> {auction.auction.bidStep}
+          </p>
+
+          <p>Are you want to approve or reject this auction?</p>
         </div>
       ) : (
         <p>No action data available</p>

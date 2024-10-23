@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Button, Space, Pagination } from 'antd';
+import { Table, Button, Space, Pagination, message } from 'antd';
 import api from '../../configs/api';
 import FishPopover from '../../components/Popover/FishPopover';
 import UserPopover from '../../components/Popover/UserPopover';
@@ -10,11 +10,10 @@ const Request = () => {
   const [loading, setLoading] = useState(true);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [currentAuction, setCurrentAuction] = useState(null);
-  const [currentPage, setCurrentPage] = useState(0); // Mặc định trang đầu là 0
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0); // Lưu tổng số trang
 
-  // Hàm fetch data với tham số page
-  const fetchData = async (page = 0, size = 2) => {
+  const fetchData = async (page = 0, size = 7) => {
     try {
       setLoading(true);
       const response = await api.get('/auction/staff/get-auction-request', {
@@ -34,31 +33,48 @@ const Request = () => {
   };
 
   useEffect(() => {
-    // console.log('render currentPage: ', currentPage + 1);
-
     fetchData(currentPage); // Gọi fetchData khi component load với trang hiện tại là 0
   }, [currentPage]);
 
   const handlePageChange = (page) => {
     console.log('render page: ', page);
-
     setCurrentPage(page - 1); // Chuyển trang, nhưng trừ đi 1 để đúng với API bắt đầu từ 0
     fetchData(page - 1);
   };
 
   const handleActionClick = (auction) => {
-    setCurrentAuction(auction);
+    setCurrentAuction(auction); // Lưu auction hiện tại vào state
     setIsActionModalOpen(true);
   };
 
-  const handleApprove = () => {
-    console.log('Approve auction', currentAuction);
-    setIsActionModalOpen(false);
+  const handleApprove = async () => {
+    if (currentAuction) {
+      try {
+        const response = await api.post(`/auction/staff/approve/${currentAuction.auction.id}`, {
+          // Thêm dữ liệu cần thiết nếu cần
+        });
+        message.success('Auction approved successfully!'); // Hiện thông báo thành công
+        setIsActionModalOpen(false);
+        fetchData(currentPage); // Cập nhật danh sách sau khi phê duyệt
+      } catch (error) {
+        message.error('Failed to approve auction. Please try again.');
+      }
+    }
   };
 
-  const handleReject = () => {
-    console.log('Reject auction', currentAuction);
-    setIsActionModalOpen(false);
+  const handleReject = async () => {
+    if (currentAuction) {
+      try {
+        const response = await api.post(`/auction/staff/reject/${currentAuction.auction.id}`, {
+          // Thêm dữ liệu cần thiết nếu cần
+        });
+        message.success('Auction rejected successfully!'); // Hiện thông báo thành công
+        setIsActionModalOpen(false);
+        fetchData(currentPage); // Cập nhật danh sách sau khi từ chối
+      } catch (error) {
+        message.error('Failed to reject auction. Please try again.'); // Hiện thông báo lỗi
+      }
+    }
   };
 
   const columns = [
@@ -147,12 +163,10 @@ const Request = () => {
 
       {/* Pagination */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-        {' '}
-        {/* Căn Pagination sang phải */}
         <Pagination
           current={currentPage + 1} // Chuyển currentPage từ 0-based sang 1-based cho UI
-          total={totalPages * 10} // Tổng số item (lấy totalPages từ API và nhân với số item mỗi trang)
-          pageSize={10} // Số lượng item trên mỗi trang
+          total={totalPages * 7} // Cập nhật tổng số record để phù hợp với số lượng mỗi trang
+          pageSize={7} // Số lượng mỗi trang
           onChange={handlePageChange} // Gọi hàm khi chuyển trang
         />
       </div>
