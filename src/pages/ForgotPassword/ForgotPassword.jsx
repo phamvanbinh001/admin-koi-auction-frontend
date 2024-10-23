@@ -1,38 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Button, message, Statistic, ConfigProvider } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import api from '../../configs/api';
-import CountDown from '../../components/Modal/CountDown';
+import CountDown from '../../components/Modal/CountDown'; // Your custom modal
 import styles from './forgot.module.scss';
+
+const { Countdown } = Statistic;
 
 const ForgotPassword = () => {
   console.log('Render ForgotPassword');
 
   const [email, setEmail] = useState('');
   const [isTokenFieldVisible, setIsTokenFieldVisible] = useState(false);
-  const [tokenExpiryTime, setTokenExpiryTime] = useState(59);
-  const [isCounting, setIsCounting] = useState(false);
   const [isTokenExpired, setIsTokenExpired] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirectPath, setRedirectPath] = useState('');
+  const [deadline, setDeadline] = useState(Date.now() + 59 * 1000); // 59 seconds countdown
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let countdown;
-    if (isCounting && tokenExpiryTime > 0) {
-      countdown = setInterval(() => {
-        setTokenExpiryTime((prevTime) => prevTime - 1);
-      }, 1000);
-    }
-
-    if (tokenExpiryTime === 0) {
-      clearInterval(countdown);
-      setIsTokenExpired(true);
-      setIsCounting(false);
-    }
-
-    return () => clearInterval(countdown);
-  }, [isCounting, tokenExpiryTime]);
 
   const handleSubmit = async () => {
     try {
@@ -41,8 +25,7 @@ const ForgotPassword = () => {
         await api.post(`forgot-password/verifyMail/${email}`);
         message.success('Mail has been sent to your email.');
         setIsTokenFieldVisible(true);
-        setTokenExpiryTime(59);
-        setIsCounting(true);
+        setDeadline(Date.now() + 59 * 1000); // Reset to 59 seconds
         setIsTokenExpired(false);
       } else {
         setRedirectPath('/401');
@@ -62,12 +45,19 @@ const ForgotPassword = () => {
     try {
       await api.post(`forgot-password/verifyMail/${email}`);
       message.success('A new token has been sent to your email.');
-      setTokenExpiryTime(59);
-      setIsCounting(true);
+      setDeadline(Date.now() + 59 * 1000); // Reset to 59 seconds
       setIsTokenExpired(false);
     } catch (error) {
       message.error('Failed to resend token. Please try again later.');
     }
+  };
+
+  const handleBackToLogin = () => {
+    navigate('/login');
+  };
+
+  const handleFinishCountdown = () => {
+    setIsTokenExpired(true);
   };
 
   const handleCloseModal = (path) => {
@@ -75,10 +65,6 @@ const ForgotPassword = () => {
     if (path) {
       navigate(path);
     }
-  };
-
-  const handleBackToLogin = () => {
-    navigate('/login');
   };
 
   return (
@@ -113,7 +99,25 @@ const ForgotPassword = () => {
         </Form>
 
         <div className={styles.countdown}>
-          {isTokenFieldVisible && (isTokenExpired ? 'Token has expired.' : `Token will expire in ${tokenExpiryTime}`)}
+          {isTokenFieldVisible &&
+            (isTokenExpired ? (
+              'Token has expired.'
+            ) : (
+              <ConfigProvider
+                theme={{
+                  components: {
+                    Statistic: {
+                      contentFontSize: '16px',
+                    },
+                  },
+                  token: {
+                    colorText: 'var(--color-primary)',
+                  },
+                }}
+              >
+                <Countdown value={deadline} format="Token will expire in s" onFinish={handleFinishCountdown} />
+              </ConfigProvider>
+            ))}
         </div>
 
         {isTokenExpired && (

@@ -38,22 +38,27 @@
   color: var(--icon-color); /* Kế thừa màu icon từ biến */
 }
 
-.notification-icon {
-  position: relative;
-  font-size: 24px;
-  margin-right: 50px;
-  cursor: pointer;
-  color: var(--icon-color); /* Kế thừa màu icon từ biến */
-}
-
 .logo {
   color: var(--icon-color); /* Kế thừa màu logo từ biến */
   font-size: 24px;
 }
 
-.language-icon {
-  font-size: 20px;
-  margin: 0 20px;
+.noti {
+  font-size: 25px;
+  margin: 10px;
+
+  cursor: pointer;
+  color: var(--icon-color);
+}
+
+.badge {
+  font-size: 15px;
+}
+
+.language {
+  font-size: 25px;
+  margin: 10px;
+
   cursor: pointer;
   color: var(--icon-color); /* Kế thừa màu icon từ biến */
 }

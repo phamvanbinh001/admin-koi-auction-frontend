@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import Logo from '../Logo'; // Giả định bạn có một component Logo
-import { Layout, Switch, Dropdown, Menu, Badge } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faUserCircle, faGlobe } from '@fortawesome/free-solid-svg-icons';
+import Logo from '../Logo';
+import { Layout, Switch, Dropdown, Menu, Badge, Avatar } from 'antd';
+import { BellFilled, GlobalOutlined } from '@ant-design/icons';
 import styles from './index.module.scss';
 import { Link } from 'react-router-dom';
 
@@ -11,7 +10,7 @@ const { Header } = Layout;
 const HeaderComponent = React.memo(() => {
   console.log('render HeaderComponent');
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(5); // Số lượng thông báo giả định
+  const [notificationCount, setNotificationCount] = useState(5);
 
   const handleThemeChange = (checked) => {
     setIsDarkMode(checked);
@@ -39,13 +38,14 @@ const HeaderComponent = React.memo(() => {
             className={styles['dark-light-switch']}
           />
           <Dropdown menu={languageMenu} trigger={['click']}>
-            <FontAwesomeIcon icon={faGlobe} className={styles['language-icon']} />
+            <GlobalOutlined className={styles.language} />
           </Dropdown>
-          <Badge count={notificationCount} overflowCount={99}>
-            <FontAwesomeIcon icon={faBell} className={styles['notification-icon']} />
+          {/* <Badge count={notificationCount} overflowCount={99} className={styles.badge}> */}
+          <Badge count={100} overflowCount={99} className={styles.badge}>
+            <BellFilled className={styles.noti} />
           </Badge>
           <Link to="/profile">
-            <FontAwesomeIcon icon={faUserCircle} className={styles['user-icon']} />
+            <Avatar shape="square" size="large" />
           </Link>
         </div>
       </div>
