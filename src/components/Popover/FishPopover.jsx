@@ -66,10 +66,10 @@ const FishPopover = ({ fishIds, children }) => {
       {fishData[currentIndex].mediaList?.[0]?.url ? (
         <div className={styles.imageContainer}>
           <img
-            src={fishData[currentIndex].mediaList[0].url}
+            src={fishData[currentIndex].mediaList[1].url}
             alt={fishData[currentIndex].koiName}
             className={styles.image}
-            onError={(e) => (e.target.src = defaultImage)} // Thay đổi ảnh lỗi thành ảnh mặc định
+            onError={(e) => (e.target.src = defaultImage)}
           />
         </div>
       ) : (
