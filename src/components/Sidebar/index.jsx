@@ -111,7 +111,7 @@ const SidebarComponent = React.memo(() => {
       {
         key: '9',
         icon: <FontAwesomeIcon icon={faCogs} />,
-        label: 'Setting',
+        label: <Link to="/setting">Setting</Link>,
         className: styles.menuItem,
       },
       {

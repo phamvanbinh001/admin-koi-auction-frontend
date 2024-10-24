@@ -11,7 +11,7 @@ const { Header } = Layout;
 const HeaderComponent = React.memo(() => {
   console.log('render HeaderComponent');
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(5);
+  // const [notificationCount, setNotificationCount] = useState(5);
   const { user } = useUserStore();
   const navigate = useNavigate();
 
@@ -21,7 +21,6 @@ const HeaderComponent = React.memo(() => {
     setIsDarkMode(checked);
   };
 
-  // Cập nhật theo API mới của Ant Design
   const languageMenu = (
     <Menu
       items={[
