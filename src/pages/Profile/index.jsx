@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Select } from 'antd';
+import { Button, Input, Select, notification } from 'antd';
 import styles from './index.module.scss';
 import api from '../../configs/api';
 import { addressApi } from '../../configs/api';
@@ -17,42 +17,55 @@ const Profile = () => {
     phoneNumber: '',
     province: '',
     district: '',
+    ward: '',
+    address: '',
   });
 
-  const [provinces, setProvinces] = useState('');
+  const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [isFormModified, setIsFormModified] = useState(false);
 
+  // Fetch user profile and provinces
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const res = await api.get('/user/get-profile', {
-          requireAuth: true,
-        });
-
+        const res = await api.get('/user/get-profile', { requireAuth: true });
         const userData = res.data;
-        let decodedAddress = 'N/A';
 
+        let province = '';
+        let district = '';
+        let ward = '';
+        let specificAddress = '';
+
+        // Parse address from the response
         if (userData.address) {
           try {
             const parsedAddress = JSON.parse(userData.address);
-            decodedAddress = `${parsedAddress.province}, ${parsedAddress.district}`;
+            province = parsedAddress.province || '';
+            district = parsedAddress.district || '';
+            ward = parsedAddress.ward || '';
+            specificAddress = parsedAddress.address || '';
           } catch (error) {
-            decodedAddress = userData.address;
+            console.error('Error parsing address:', error);
           }
         }
 
         setUserDetails({
           ...userData,
-          address: decodedAddress,
+          province,
+          district,
+          ward,
+          specificAddress,
         });
 
         setEditableDetails({
           fullName: userData.fullName || '',
           userName: userData.userName || '',
           phoneNumber: userData.phoneNumber || '',
-          province: '',
-          district: '',
+          province, // Set province name
+          district, // Set district name
+          ward,
+          address: specificAddress,
         });
       } catch (error) {
         console.log('Error fetching user details:', error);
@@ -63,7 +76,7 @@ const Profile = () => {
 
     const fetchProvinces = async () => {
       try {
-        const res = await addressApi.get('/1/0.htm');
+        const res = await addressApi.get('/1/0.htm'); // Fetch provinces
         setProvinces(res.data.data);
       } catch (error) {
         console.log('Error fetching provinces:', error);
@@ -74,10 +87,7 @@ const Profile = () => {
     fetchProvinces();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
+  // Fetch districts when province changes
   const fetchDistricts = async (provinceId) => {
     try {
       const res = await addressApi.get(`/2/${provinceId}.htm`);
@@ -87,18 +97,19 @@ const Profile = () => {
     }
   };
 
-  const handleProvinceChange = (value) => {
+  const handleProvinceChange = (provinceId, option) => {
     setEditableDetails((prevState) => ({
       ...prevState,
-      province: value,
+      province: option.children, // Save province name, not ID
+      district: '', // Reset district when province changes
     }));
-    fetchDistricts(value);
+    fetchDistricts(provinceId); // Load districts for the selected province
   };
 
-  const handleDistrictChange = (value) => {
+  const handleDistrictChange = (districtId, option) => {
     setEditableDetails((prevState) => ({
       ...prevState,
-      district: value,
+      district: option.children, // Save district name, not ID
     }));
   };
 
@@ -111,9 +122,42 @@ const Profile = () => {
     setIsFormModified(true);
   };
 
-  const handleSaveChanges = async () => {
-    // Logic to save changes here
+  // Show notification function
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+    });
   };
+
+  // Save updated profile
+  const handleSaveChanges = async () => {
+    const fullAddress = JSON.stringify({
+      province: editableDetails.province,
+      district: editableDetails.district,
+      ward: editableDetails.ward,
+      address: editableDetails.address,
+    });
+
+    const updateData = {
+      userName: editableDetails.userName,
+      fullName: editableDetails.fullName,
+      phoneNumber: editableDetails.phoneNumber,
+      address: fullAddress, // Send address as a JSON string
+    };
+
+    try {
+      const res = await api.put('/user/profile', updateData);
+      openNotification('success', 'Update Successful', 'Your profile has been updated successfully.');
+    } catch (error) {
+      console.log('Error saving changes:', error);
+      openNotification('error', 'Update Failed', 'There was an error while updating your profile.');
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -141,6 +185,7 @@ const Profile = () => {
             <div className={styles.readOnlySection}>
               <FormField label="Role" value={userDetails.role} readOnly={true} />
               <FormField label="Email" value={userDetails.email} readOnly={true} />
+              <FormField label="Password" value={userDetails.password} readOnly={true} />
               <FormField
                 label="Created At"
                 value={userDetails.createAt ? new Date(userDetails.createAt).toLocaleString() : 'N/A'}
@@ -179,21 +224,20 @@ const Profile = () => {
                     <h6 className={`${styles.mb0} ${styles.largeLabel}`}>Province</h6>
                   </div>
                   <div className={styles.colSm9}>
-                    {provinces.length > 0 ? (
-                      <Select
-                        value={editableDetails.province}
-                        onChange={handleProvinceChange}
-                        style={{ width: '100%' }}
-                      >
-                        {provinces.map((province) => (
-                          <Option key={province.id} value={province.id}>
-                            {province.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    ) : (
-                      <p>Loading . . .</p>
-                    )}
+                    <Select
+                      value={editableDetails.province || 'default'}
+                      onChange={handleProvinceChange}
+                      style={{ width: '100%' }}
+                    >
+                      <Option value="default" disabled>
+                        Select your province
+                      </Option>
+                      {provinces.map((province) => (
+                        <Option key={province.id} value={province.id}>
+                          {province.name}
+                        </Option>
+                      ))}
+                    </Select>
                   </div>
                 </div>
 
@@ -204,11 +248,14 @@ const Profile = () => {
                   </div>
                   <div className={styles.colSm9}>
                     <Select
-                      value={editableDetails.district}
+                      value={editableDetails.district || 'default'}
                       onChange={handleDistrictChange}
                       style={{ width: '100%' }}
                       disabled={!editableDetails.province}
                     >
+                      <Option value="default" disabled>
+                        Select your district
+                      </Option>
                       {districts.map((district) => (
                         <Option key={district.id} value={district.id}>
                           {district.name}
@@ -219,7 +266,15 @@ const Profile = () => {
                 </div>
 
                 <FormField
-                  label="Address"
+                  label="Ward"
+                  name="ward"
+                  value={editableDetails.ward}
+                  onChange={handleInputChange}
+                  readOnly={false}
+                />
+
+                <FormField
+                  label="Specific Address"
                   name="address"
                   value={editableDetails.address}
                   onChange={handleInputChange}
@@ -240,13 +295,13 @@ const Profile = () => {
   );
 };
 
-const FormField = ({ label, name, value, onChange, readOnly = false }) => (
+const FormField = ({ label, name, value, onChange, readOnly }) => (
   <div className={styles.rowMb3}>
     <div className={styles.colSm3}>
       <h6 className={`${styles.mb0} ${styles.largeLabel}`}>{label}</h6>
     </div>
     <div className={styles.colSm9}>
-      <Input name={name} onChange={onChange} readOnly={readOnly} value={value} />
+      {readOnly ? <Input value={value} readOnly /> : <Input name={name} value={value} onChange={onChange} />}
     </div>
   </div>
 );

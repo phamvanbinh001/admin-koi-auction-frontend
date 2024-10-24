@@ -9,8 +9,7 @@ import FishPopover from '../../components/Popover/FishPopover';
 const Auction = () => {
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalElements, setTotalElements] = useState(0); // Để quản lý tổng số phần tử
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const fetchData = async () => {
@@ -20,8 +19,7 @@ const Auction = () => {
         requireAuth: true,
       });
 
-      setAuctions(response.data.auction); // Cập nhật dữ liệu auction
-      setTotalElements(response.data.totalElements); // Cập nhật tổng số phần tử để hiển thị pagination
+      setAuctions(response.data);
     } catch (error) {
       console.error('Failed to fetch auction data', error);
     } finally {
@@ -30,10 +28,10 @@ const Auction = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage, pageSize);
-  }, [currentPage, pageSize]); // Fetch lại dữ liệu khi trang hoặc kích thước trang thay đổi
+    // fetchData(currentPage, pageSize);
+    fetchData();
+  }, [currentPage, pageSize]);
 
-  // handle null value to uppercase
   const toUpperCase2 = (value) => {
     return value ? value.toUpperCase() : 'N/A';
   };
@@ -42,17 +40,17 @@ const Auction = () => {
     {
       title: 'ID',
       dataIndex: ['auction', 'id'],
-      key: 'id',
+      // key: 'id',
     },
     {
       title: 'Fish Details',
       key: 'koiFish',
-      render: (text, record) => {
+      render: (text) => {
         return (
           <>
             <b>
-              {record.koiFish && record.koiFish.length > 0 ? (
-                <FishPopover fishIds={record.koiFish}>Click here</FishPopover>
+              {text.koiFish && text.koiFish.length > 0 ? (
+                <FishPopover fishIds={text.koiFish}>Click here</FishPopover>
               ) : (
                 'No Fish Data'
               )}
@@ -78,7 +76,7 @@ const Auction = () => {
     {
       title: 'Method',
       dataIndex: ['auction', 'auctionMethod'],
-      key: 'auctionMethod',
+      // key: 'auctionMethod',
     },
     {
       title: 'Start Price',
@@ -88,12 +86,12 @@ const Auction = () => {
     {
       title: 'Bid Step',
       dataIndex: ['auction', 'bidStep'],
-      key: 'bidStep',
+      // key: 'bidStep',
     },
     {
       title: 'Buyout Price',
       dataIndex: ['auction', 'buyoutPrice'],
-      key: 'buyoutPrice',
+      // key: 'buyoutPrice',
     },
     {
       title: 'Final Price',
@@ -113,13 +111,13 @@ const Auction = () => {
     {
       title: 'Approved By',
       dataIndex: ['auction', 'staffID'],
-      key: 'staffID',
+      // key: 'staffID',
       render: (text) => <UserPopover userId={text} />,
     },
     {
       title: 'Status',
       dataIndex: ['auction', 'status'],
-      key: 'status',
+      // key: 'status',
       render: (status) => {
         let color;
         switch (status) {
@@ -182,8 +180,6 @@ const Auction = () => {
 
   return (
     <>
-      <h2 style={{ marginBottom: '20px' }}>{`Có tổng cộng ${totalElements} cuộc đấu giá`}</h2>
-
       <Flex gap="small" align="flex-end" vertical onClick={exportToExcel} style={{ marginBottom: '20px' }}>
         <Flex gap="small" wrap>
           <Button type="primary" icon={<DownloadOutlined />} size={'middle'}>
@@ -199,8 +195,6 @@ const Auction = () => {
         pagination={{
           current: currentPage,
           pageSize: pageSize,
-          // Tổng số phần tử để hiện pagination
-          // total: totalElements,
           onChange: (page, size) => {
             setCurrentPage(page);
             setPageSize(size);
