@@ -1,140 +1,109 @@
 import React, { useState, useEffect } from 'react';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
-import { Form, Button, Input } from 'antd';
+import { Form, Button, Input, Card, Statistic, ConfigProvider } from 'antd';
+import { UsergroupAddOutlined, DollarOutlined, ShoppingCartOutlined, LinuxOutlined } from '@ant-design/icons';
 import api from '../../configs/api';
 import styles from './index.module.scss';
 
 Chart.register(...registerables);
 
-// Component cho Summary Card
-const SummaryCard = React.memo(({ label, value }) => {
-  return (
-    <div className={styles.summaryCard}>
-      {label}: {value}
-    </div>
-  );
-});
+const SummaryCard = React.memo(({ label, value, icon }) => (
+  <Card bordered={true} className={styles.summaryCard}>
+    <Statistic title={label} value={value} prefix={icon} />
+  </Card>
+));
 
-// Component cho Biểu đồ Bar
-const BarChart = React.memo(({ data }) => {
-  return <Bar data={data} options={{ maintainAspectRatio: false, responsive: true }} />;
-});
+const BarChart = React.memo(({ data }) => (
+  <Bar data={data} options={{ maintainAspectRatio: false, responsive: true }} />
+));
 
-// Component cho Biểu đồ Pie
-const PieChart = React.memo(({ data }) => {
-  return <Pie data={data} options={{ maintainAspectRatio: false, responsive: true }} />;
-});
+// Component cho biểu đồ Pie
+const PieChart = React.memo(({ data }) => (
+  <Pie data={data} options={{ maintainAspectRatio: false, responsive: true }} />
+));
 
-// Component cho Biểu đồ Line
-const LineChart = React.memo(({ data }) => {
-  return <Line data={data} options={{ maintainAspectRatio: false, responsive: true }} />;
-});
+const LineChart = React.memo(({ data }) => (
+  <Line data={data} options={{ maintainAspectRatio: false, responsive: true }} />
+));
 
 const Dashboard = () => {
   const [summaryData, setSummaryData] = useState(null);
+
+  const currDate = new Date();
+  const currYear = currDate.getFullYear();
+
   const [dateFilters, setDateFilters] = useState({
     day: null,
     month: null,
-    year: new Date().getFullYear(), // Mặc định năm hiện tại
+    year: currYear,
   });
 
-  const dataDemo = {
-    lineChartData: {
+  const chartData = {
+    line: {
       labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
       datasets: [
         {
-          label: 'New Users',
+          label: 'Revenue',
           data: [65, 59, 80, 81, 56, 55, 40],
-          fill: false,
-          backgroundColor: 'rgba(75, 192, 192, 0.7)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 2,
         },
       ],
     },
-    pieChartData: {
-      labels: ['Red', 'Blue', 'Yellow'],
+    pie: {
+      labels: ['Bình', 'Vẫn là bình', 'Bình nữa'],
       datasets: [
         {
           data: [300, 50, 100],
-          backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)'],
-          borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
-          borderWidth: 2,
         },
       ],
     },
-    barChartData: {
+    col: {
       labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
       datasets: [
         {
-          label: 'Sales',
+          label: 'Auctions',
           data: [65, 59, 80, 81, 56, 55, 40],
-          backgroundColor: 'rgba(75, 192, 192, 0.8)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 2,
         },
       ],
     },
   };
 
-  // Fetch API data dựa trên các bộ lọc thời gian
-  const fetchSummaryData = async () => {
+  const fetchSummaryData = async (filters = dateFilters) => {
     try {
-      const { day, month, year } = dateFilters;
-      const params = {};
-
-      if (day) params.day = day;
-      if (month) params.month = month;
-      if (year) params.year = year;
-
-      const response = await api.get('/dashboard', { params });
-      setSummaryData(response.data); // Cập nhật dữ liệu tóm tắt
+      const response = await api.get('/dashboard', { params: filters });
+      setSummaryData(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
-
   useEffect(() => {
-    // Lấy dữ liệu mặc định cho năm hiện tại
     fetchSummaryData();
   }, []);
 
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setDateFilters((prev) => ({
-      ...prev,
-      [name]: value ? parseInt(value) : null, // Chuyển đổi thành số nếu có giá trị
-    }));
-  };
-
-  // Submit form để fetch data
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    fetchSummaryData();
+  const onFinish = (values) => {
+    const { day, month, year } = values;
+    const filters = {
+      ...(day && { day: parseInt(day) }),
+      ...(month && { month: parseInt(month) }),
+      ...(year && { year: parseInt(year) }),
+    };
+    fetchSummaryData(filters);
   };
 
   return (
     <div className={styles.dashboard}>
-      <Form layout="inline" className={styles.filterForm} onSubmit={handleFormSubmit}>
-        <Form.Item label="Day">
-          <Input name="day" type="number" onChange={handleInputChange} placeholder="Enter day" />
+      <Form layout="inline" className={styles.filterForm} onFinish={onFinish} initialValues={dateFilters}>
+        <Form.Item name="day" label="Day">
+          <Input type="number" min={1} max={31} />
         </Form.Item>
-        <Form.Item label="Month">
-          <Input name="month" type="number" onChange={handleInputChange} placeholder="Enter month" />
+        <Form.Item name="month" label="Month">
+          <Input type="number" min={1} max={12} />
         </Form.Item>
-        <Form.Item label="Year">
-          <Input
-            name="year"
-            type="number"
-            value={dateFilters.year}
-            onChange={handleInputChange}
-            placeholder="Enter year"
-          />
+        <Form.Item name="year" label="Year">
+          <Input type="number" min={2000} max={currYear} />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" onClick={handleFormSubmit}>
+          <Button type="primary" htmlType="submit">
             Submit
           </Button>
         </Form.Item>
@@ -142,25 +111,43 @@ const Dashboard = () => {
 
       <div className={styles.summaryWrapper}>
         {summaryData && (
-          <>
-            <SummaryCard label="New Users" value={summaryData.newUserCount} />
-            <SummaryCard label="Revenue" value={summaryData.revenue} />
-            <SummaryCard label="Auctions" value={summaryData.auctionCount} />
-            <SummaryCard label="Finished Auctions" value={summaryData.finishedAuctionCount} />
-          </>
+          <ConfigProvider
+            theme={{
+              components: {
+                Statistic: {
+                  titleFontSize: 17,
+                  contentFontSize: 20,
+                },
+              },
+              token: { colorText: 'var(--primary-color)' },
+            }}
+          >
+            <SummaryCard label="New Users" value={summaryData.newUserCount} icon={<UsergroupAddOutlined />} />
+            <SummaryCard
+              label="Revenue"
+              value={summaryData.revenue !== null ? summaryData.revenue : 'No Data Available'}
+              icon={<DollarOutlined />}
+            />
+            <SummaryCard label="Auctions" value={summaryData.auctionCount} icon={<LinuxOutlined />} />
+            <SummaryCard
+              label="Finished Auctions"
+              value={summaryData.finishedAuctionCount}
+              icon={<ShoppingCartOutlined />}
+            />
+          </ConfigProvider>
         )}
       </div>
 
       <div className={styles.chartWrapper}>
         <div className={styles.chartBorder}>
-          <BarChart data={dataDemo.barChartData} />
+          <BarChart data={chartData.col} />
         </div>
         <div className={styles.chartBorderPie}>
-          <PieChart data={dataDemo.pieChartData} />
+          <PieChart data={chartData.pie} />
         </div>
       </div>
       <div className={styles.chartBorder}>
-        <LineChart data={dataDemo.lineChartData} />
+        <LineChart data={chartData.line} />
       </div>
     </div>
   );
