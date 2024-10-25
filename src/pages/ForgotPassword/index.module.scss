@@ -10,17 +10,25 @@
   border-radius: 8px;
   width: 600px;
   border: 2px solid red;
+  box-shadow: 0 4px 15px rgba(145, 38, 38, 0.3);
+  transition: transform 0.5s ease, box-shadow 0.3s ease;
 }
 
-.countdown {
-  display: flex;
-  color: red;
-  font-size: 15px;
-  margin-left: 10px;
+.form:hover {
+  transform: scale(1.99);
 }
 
 .logo {
   position: absolute;
   top: 15px;
   left: 15px;
+}
+
+.loginBtn {
+  width: 18%;
+  margin: 5px;
+}
+
+.submitBtn {
+  width: 80%;
 }

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, message, Statistic, ConfigProvider, Spin } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, message, Spin, ConfigProvider } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import api from '../../configs/api';
 import CountDown from '../../components/Modal/CountDown';
@@ -7,70 +7,66 @@ import styles from './index.module.scss';
 import { LoadingOutlined } from '@ant-design/icons';
 import Logo from '../../components/Logo';
 
-const { Countdown } = Statistic;
-
 const ForgotPassword = () => {
-  console.log('Render ForgotPassword');
-
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isTokenFieldVisible, setIsTokenFieldVisible] = useState(false);
   const [isTokenExpired, setIsTokenExpired] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
   const [redirectPath, setRedirectPath] = useState('');
-  const [deadline, setDeadline] = useState(Date.now() + 59 * 1000); // 59 seconds countdown
+  const [remainingTime, setRemainingTime] = useState(5);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let timer;
+    if (remainingTime > 0 && isTokenFieldVisible && !isTokenExpired) {
+      timer = setInterval(() => {
+        setRemainingTime((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (remainingTime === 0) {
+      setIsTokenExpired(true);
+    }
+    return () => clearInterval(timer);
+  }, [remainingTime, isTokenFieldVisible, isTokenExpired]);
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const role = 'Staff';
-      if (role === 'Staff') {
-        await api.post(`forgot-password/verifyMail/${email}`);
-        message.success('Mail has been sent to your email.');
-        setIsTokenFieldVisible(true);
-        setDeadline(Date.now() + 59 * 1000); // Reset to 59 seconds
-        setIsTokenExpired(false);
-      } else {
-        setRedirectPath('/401');
-        setIsModalVisible(true);
-      }
+      await api.post(`forgot-password/verifyMail/${email}`);
+      message.success('Mail has been sent to your email.');
+      setIsTokenFieldVisible(true);
+      setRemainingTime(5);
+      setIsTokenExpired(false);
     } catch (error) {
       if (error.response?.status === 404) {
+        setModalTitle('Email not found.');
         setRedirectPath('/404');
-        setIsModalVisible(true);
+      } else if (error.response?.status === 401) {
+        setModalTitle("You don't have permission to reset password here.");
+        setRedirectPath('/401');
       } else {
-        message.error('An error occurred. Please try again later.');
+        setModalTitle('An unexpected error occurred.');
+        setRedirectPath('/401');
       }
+      setIsModalVisible(true);
     } finally {
       setLoading(false);
     }
   };
 
   const handleResendToken = async () => {
-    try {
-      await api.post(`forgot-password/verifyMail/${email}`);
-      message.success('A new token has been sent to your email.');
-      setDeadline(Date.now() + 59 * 1000); // Reset to 59 seconds
-      setIsTokenExpired(false);
-    } catch (error) {
-      message.error('Failed to resend token. Please try again later.');
-    }
-  };
-
-  const handleBackToLogin = () => {
-    navigate('/login');
-  };
-
-  const handleFinishCountdown = () => {
-    setIsTokenExpired(true);
+    await api.post(`forgot-password/verifyMail/${email}`);
+    message.success('A new OTP has been sent.');
+    setRemainingTime(5);
+    setIsTokenExpired(false);
   };
 
   const handleCloseModal = (path) => {
     setIsModalVisible(false);
-    if (path) {
-      navigate(path);
-    }
+    navigate(path);
   };
 
   return (
@@ -78,75 +74,60 @@ const ForgotPassword = () => {
       <div className={styles.logo}>
         <Logo />
       </div>
-
-      <div className={styles.form}>
-        <h2>Forgot Password</h2>
-
-        <Form onFinish={handleSubmit}>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, type: 'email', message: 'Please enter a valid email address' }]}
-          >
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-          </Form.Item>
-
-          {isTokenFieldVisible && (
-            <Form.Item label="Token" name="token" rules={[{ required: true, message: 'Please enter your token' }]}>
+      <Form onFinish={handleSubmit} className={styles.form}>
+        <Form.Item label="Email" name="email" rules={[{ required: true, type: 'email' }]}>
+          <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+        </Form.Item>
+        <Form.Item label="New Password" name="password" rules={[{ required: true, min: 6 }]}>
+          <Input.Password value={password} onChange={(e) => setPassword(e.target.value)} />
+        </Form.Item>
+        <Form.Item
+          label="Confirm Password"
+          name="confirmPassword"
+          rules={[
+            { required: true },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                return value && getFieldValue('password') === value
+                  ? Promise.resolve()
+                  : Promise.reject('Passwords do not match');
+              },
+            }),
+          ]}
+        >
+          <Input.Password value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+        </Form.Item>
+        {isTokenFieldVisible && (
+          <>
+            <Form.Item label="OTP" name="token" rules={[{ required: true }]}>
               <Input disabled={isTokenExpired} />
             </Form.Item>
+            <Form.Item label="OTP will expires in">
+              <Input
+                value={isTokenExpired ? 'Expired' : `${remainingTime}`}
+                readOnly
+                className={styles.countdownInput}
+              />
+            </Form.Item>
+          </>
+        )}
+        <div>
+          {isTokenExpired && (
+            <Button className={styles.loginBtn} type="primary" onClick={handleResendToken}>
+              Resend
+            </Button>
           )}
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className={styles.submitBtn}>
-              {loading ? <Spin indicator={<LoadingOutlined spin />} /> : 'Submit'}
-            </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <Button onClick={handleBackToLogin} className={styles.loginBtn}>
-              Back to Login
-            </Button>
-          </Form.Item>
-        </Form>
-
-        <div className={styles.countdown}>
-          {isTokenFieldVisible &&
-            (isTokenExpired ? (
-              'Token has expired.'
-            ) : (
-              <ConfigProvider
-                theme={{
-                  components: {
-                    Statistic: {
-                      contentFontSize: '16px',
-                    },
-                  },
-                  token: {
-                    colorText: 'var(--color-primary)',
-                  },
-                }}
-              >
-                <Countdown value={deadline} format="Token will expire in s" onFinish={handleFinishCountdown} />
-              </ConfigProvider>
-            ))}
         </div>
-
-        {isTokenExpired && (
-          <Button type="primary" onClick={handleResendToken}>
-            Resend Token
-          </Button>
-        )}
-
         {isModalVisible && (
-          <CountDown
-            title="You don't have permission to reset password here."
-            initialTime={5}
-            onClose={handleCloseModal}
-            redirectPath={redirectPath}
-          />
+          <CountDown title={modalTitle} initialTime={5} onClose={handleCloseModal} redirectPath={redirectPath} />
         )}
-      </div>
+        <Button onClick={() => navigate('/login')} className={styles.loginBtn}>
+          Back to Login
+        </Button>
+        <Button type="primary" htmlType="submit" className={styles.submitBtn}>
+          {loading ? <Spin indicator={<LoadingOutlined spin style={{ color: 'white' }} />} /> : 'Submit'}
+        </Button>
+      </Form>
     </div>
   );
 };

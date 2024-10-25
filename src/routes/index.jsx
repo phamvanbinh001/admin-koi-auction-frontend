@@ -12,14 +12,12 @@ import Transaction from '../pages/Transaction';
 import Page401 from '../pages/401';
 import Page404 from '../pages/404';
 import ForgotPassword from '../pages/ForgotPassword/ForgotPassword.jsx';
-import ResetPassword from '../pages/ForgotPassword/ResetPassword.jsx';
 
 const publicRoutes = [
   { path: '/401', component: Page401 },
   { path: '*', component: Page404 },
   { path: '/login', component: Login },
   { path: '/forgotPassword', component: ForgotPassword },
-  { path: '/resetPassword', component: ResetPassword },
 ];
 
 const privateRoutes = [
