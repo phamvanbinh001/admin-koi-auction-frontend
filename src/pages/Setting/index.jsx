@@ -23,7 +23,7 @@ const Setting = () => {
       });
 
       form.setFieldsValue({
-        breederDeposit: depositResponse.data,
+        breederDeposit: depositResponse.data * 100,
         auctionFee: feeResponse.data,
       });
     } catch (error) {
@@ -44,7 +44,7 @@ const Setting = () => {
       const feeValue = auctionFee !== undefined ? auctionFee : currentValues.auctionFee;
 
       if (depositValue !== currentValues.breederDeposit) {
-        await api.put(`/system-config/breeder-deposit?value=${depositValue}`);
+        await api.put(`/system-config/breeder-deposit?value=${depositValue / 100}`);
       }
 
       if (feeValue !== currentValues.auctionFee) {
@@ -70,15 +70,15 @@ const Setting = () => {
   return (
     <Form form={form} onFinish={handleSaveChanges} layout="vertical">
       <Form.Item
-        label="Breeder Deposit"
+        label="Breeder Deposit ( % )"
         name="breederDeposit"
         rules={[{ required: true, message: 'Please input breeder deposit!' }]}
       >
-        <Input type="number" min={0} placeholder={currentValues.breederDeposit} />
+        <Input type="number" min={0} max={100} placeholder={currentValues.breederDeposit} />
       </Form.Item>
 
       <Form.Item
-        label="Auction Fee"
+        label="Auction Fee ( VNĐ)"
         name="auctionFee"
         rules={[{ required: true, message: 'Please input auction fee!' }]}
       >

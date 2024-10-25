@@ -1,24 +1,42 @@
 import React from 'react';
-import { Breadcrumb, ConfigProvider } from 'antd';
-import styles from './index.module.scss';
-const BreadcrumbComponent = React.memo(() => {
-  console.log('render BreadcrumbComponent');
+import { Breadcrumb as AntBreadcrumb } from 'antd';
+import { Link, useLocation } from 'react-router-dom';
+
+const breadcrumbNameMap = {
+  '/': 'Dashboard',
+  '/management': 'Management',
+  '/management/request': 'Requests',
+  '/management/auction': 'Auctions',
+  '/management/transaction': 'Transactions',
+  '/management/user': 'Users',
+  '/services': 'Services',
+  '/services/chat': 'Chats',
+  '/services/email': 'Emails',
+  '/services/blog': 'Blogs',
+  '/setting': 'Setting',
+};
+
+function BreadcrumbComponent() {
+  const location = useLocation();
+  const pathSnippets = location.pathname.split('/').filter((i) => i);
+
+  const breadcrumbItems = pathSnippets.map((_, index) => {
+    const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
+    return {
+      key: url,
+      title: <Link to={url}>{breadcrumbNameMap[url] || '404'}</Link>,
+    };
+  });
 
   const items = [
     {
-      title: 'Home',
-      link: '/',
+      key: 'home',
+      title: <Link to="/">Dashboard</Link>,
     },
-    {
-      title: 'Dashboard',
-      link: '/',
-    },
+    ...breadcrumbItems,
   ];
-  return (
-    <div className={styles.breadcrumbContainer}>
-      <Breadcrumb items={items} />
-    </div>
-  );
-});
+
+  return <AntBreadcrumb items={items} separator="/" style={{ margin: '10px' }} />;
+}
 
 export default BreadcrumbComponent;

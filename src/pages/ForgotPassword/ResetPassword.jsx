@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import styles from './reset.module.scss';
+import styles from './index.module.scss';
+import Logo from '../../components/Logo';
 
 const ResetPassword = () => {
   const [form] = Form.useForm();
@@ -21,7 +22,6 @@ const ResetPassword = () => {
       // Gọi API để reset password
       // const response = await api.post('/reset-password', { newPassword });
       message.success('Password reset successfully!');
-      // Điều hướng đến trang đăng nhập hoặc trang khác sau khi reset thành công
       navigate('/login');
     } catch (error) {
       message.error('Failed to reset password. Please try again.');
@@ -36,6 +36,9 @@ const ResetPassword = () => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.logo}>
+        <Logo />
+      </div>
       <div className={styles.form}>
         <h2>Reset Password</h2>
         <Form form={form} onFinish={onFinish} layout="vertical">

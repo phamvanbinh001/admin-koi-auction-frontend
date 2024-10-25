@@ -3,7 +3,6 @@ import { Layout, Menu, Button, ConfigProvider } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHouse,
-  faFolderOpen,
   faCogs,
   faSignOutAlt,
   faEnvelope,
@@ -28,7 +27,6 @@ const SidebarComponent = React.memo(() => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useUserStore();
-  //Tránh việc reRender kể cả khi props không thay đổi
   const role = useMemo(() => user.role, []);
 
   const handleLogout = () => {
@@ -51,33 +49,27 @@ const SidebarComponent = React.memo(() => {
         className: styles.subMenuItem,
         children: [
           {
-            key: '2',
-            label: <Link to="/request">Requests</Link>,
+            key: '/management/requests',
+            label: <Link to="/management/request">Requests</Link>,
             icon: <FontAwesomeIcon icon={faListCheck} />,
             className: styles.menuItem,
           },
           {
-            key: '3',
-            label: <Link to="/auction">Auctions</Link>,
+            key: '/management/auctions',
+            label: <Link to="/management/auction">Auctions</Link>,
             icon: <FontAwesomeIcon icon={faFileContract} />,
             className: styles.menuItem,
           },
           role === 'Admin' && {
-            key: '4',
-            label: <Link to="/transaction">Transactions</Link>,
+            key: '/management/transactions',
+            label: <Link to="/management/transaction">Transactions</Link>,
             icon: <FontAwesomeIcon icon={faWallet} />,
             className: styles.menuItem,
           },
           role === 'Admin' && {
-            key: '5',
-            label: <Link to="/user">Users</Link>,
+            key: '/management/users',
+            label: <Link to="/management/user">Users</Link>,
             icon: <FontAwesomeIcon icon={faUsers} />,
-            className: styles.menuItem,
-          },
-          {
-            key: '1000',
-            label: <Link to="/category">Category</Link>,
-            icon: <FontAwesomeIcon icon={faFolderOpen} />,
             className: styles.menuItem,
           },
         ].filter(Boolean),
@@ -89,20 +81,20 @@ const SidebarComponent = React.memo(() => {
         className: styles.subMenuItem,
         children: [
           {
-            key: '6',
-            label: <Link to="/chat">Chat</Link>,
+            key: '/services/chat',
+            label: <Link to="/services/chat">Chat</Link>,
             icon: <FontAwesomeIcon icon={faCommentDots} />,
             className: styles.menuItem,
           },
           {
-            key: '7',
-            label: <Link to="/email">Email</Link>,
+            key: '/services/email',
+            label: <Link to="/services/email">Email</Link>,
             icon: <FontAwesomeIcon icon={faEnvelope} />,
             className: styles.menuItem,
           },
           {
-            key: '8',
-            label: <Link to="/blog">Blogs</Link>,
+            key: '/services/blog',
+            label: <Link to="/services/blog">Blogs</Link>,
             icon: <FontAwesomeIcon icon={faBlog} />,
             className: styles.menuItem,
           },
