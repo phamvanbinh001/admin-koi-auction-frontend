@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, message, Statistic, ConfigProvider } from 'antd';
+import { Form, Input, Button, message, Statistic, ConfigProvider, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import api from '../../configs/api';
-import CountDown from '../../components/Modal/CountDown'; // Your custom modal
-import styles from './forgot.module.scss';
+import CountDown from '../../components/Modal/CountDown';
+import styles from './index.module.scss';
+import { LoadingOutlined } from '@ant-design/icons';
+import Logo from '../../components/Logo';
 
 const { Countdown } = Statistic;
 
@@ -16,9 +18,11 @@ const ForgotPassword = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirectPath, setRedirectPath] = useState('');
   const [deadline, setDeadline] = useState(Date.now() + 59 * 1000); // 59 seconds countdown
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       const role = 'Staff';
       if (role === 'Staff') {
@@ -38,6 +42,8 @@ const ForgotPassword = () => {
       } else {
         message.error('An error occurred. Please try again later.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,18 +75,18 @@ const ForgotPassword = () => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.logo}>
+        <Logo />
+      </div>
+
       <div className={styles.form}>
-        <div className={styles.header}>
-          <Button onClick={handleBackToLogin} className={styles.loginBtn}>
-            Back to Login
-          </Button>
-          <h2 style={{ flex: 1 }}>Forgot Password</h2>
-        </div>
+        <h2>Forgot Password</h2>
+
         <Form onFinish={handleSubmit}>
           <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, type: 'email', message: 'Please put email' }]}
+            rules={[{ required: true, type: 'email', message: 'Please enter a valid email address' }]}
           >
             <Input value={email} onChange={(e) => setEmail(e.target.value)} />
           </Form.Item>
@@ -92,8 +98,14 @@ const ForgotPassword = () => {
           )}
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Submit
+            <Button type="primary" htmlType="submit" className={styles.submitBtn}>
+              {loading ? <Spin indicator={<LoadingOutlined spin />} /> : 'Submit'}
+            </Button>
+          </Form.Item>
+
+          <Form.Item>
+            <Button onClick={handleBackToLogin} className={styles.loginBtn}>
+              Back to Login
             </Button>
           </Form.Item>
         </Form>
