@@ -11,7 +11,7 @@ const Request = () => {
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [currentAuction, setCurrentAuction] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0); // Lưu tổng số trang
+  const [totalPages, setTotalPages] = useState(0);
 
   const fetchData = async (page = 0, size = 7) => {
     try {
@@ -43,7 +43,7 @@ const Request = () => {
   };
 
   const handleActionClick = (auction) => {
-    setCurrentAuction(auction); // Lưu auction hiện tại vào state
+    setCurrentAuction(auction);
     setIsActionModalOpen(true);
   };
 
@@ -86,12 +86,12 @@ const Request = () => {
     {
       title: 'Koi',
       key: 'koiFish',
-      render: (text, record) => {
+      render: (text) => {
         return (
           <>
             <b>
-              {record.koiFish && record.koiFish.length > 0 ? (
-                <FishPopover fishIds={record.koiFish}>Click here</FishPopover>
+              {text.koiFish && text.koiFish.length > 0 ? (
+                <FishPopover fishIds={text.koiFish}>Click here</FishPopover>
               ) : (
                 'No Fish Data'
               )}
@@ -161,14 +161,8 @@ const Request = () => {
         pagination={false} // Tắt phân trang của Ant Design, dùng Pagination riêng
       />
 
-      {/* Pagination */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-        <Pagination
-          current={currentPage + 1} // Chuyển currentPage từ 0-based sang 1-based cho UI
-          total={totalPages * 7} // Cập nhật tổng số record để phù hợp với số lượng mỗi trang
-          pageSize={7} // Số lượng mỗi trang
-          onChange={handlePageChange} // Gọi hàm khi chuyển trang
-        />
+        <Pagination current={currentPage + 1} total={totalPages * 7} pageSize={7} onChange={handlePageChange} />
       </div>
 
       <ApproveAuction

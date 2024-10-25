@@ -1,4 +1,3 @@
-// src/components/CustomModal.js
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'antd';
 
@@ -22,7 +21,7 @@ const CountDown = ({ title, initialTime, onClose, redirectPath }) => {
 
   return (
     <Modal title={title} open={true} footer={null} onCancel={() => onClose()}>
-      <p>{redirectTime > 0 ? `${redirectTime}  seconds . . .` : 'Redirecting...'}</p>
+      <p>{redirectTime > 0 ? `Redirect in ${redirectTime} . . .` : 'Redirecting...'}</p>
     </Modal>
   );
 };
