@@ -3,7 +3,7 @@ import { Modal, Select, Button } from 'antd';
 
 const { Option } = Select;
 
-const RoleUpdate = ({ visible, currentRole, newRole, setNewRole, onSubmit, onCancel }) => {
+const RoleUpdate = ({ visible, currentRole, setNewRole, onSubmit, onCancel }) => {
   return (
     <Modal
       title="Update Role"
