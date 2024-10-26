@@ -11,6 +11,7 @@ const User = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [currentName, setCurrentName] = useState('');
+  const [currStatus, setCurrStatus] = useState('');
   const [currentRole, setCurrentRole] = useState(null);
   const [newRole, setNewRole] = useState(null);
 
@@ -22,7 +23,28 @@ const User = () => {
       const response = await api.get('/admin-manager/users/getAll', {
         requireAuth: true,
       });
-      setUsers(response.data);
+
+      const formattedUsers = response.data.map((user) => {
+        let formattedAddress = user.address;
+
+        if (formattedAddress) {
+          try {
+            const parsedAddress = JSON.parse(formattedAddress);
+            formattedAddress = `${parsedAddress.province || ''}, ${parsedAddress.district || ''}, ${
+              parsedAddress.ward || ''
+            }, ${parsedAddress.address || ''}`;
+          } catch (error) {
+            console.error('Error parsing address:', error);
+          }
+        }
+
+        return {
+          ...user,
+          address: formattedAddress,
+        };
+      });
+
+      setUsers(formattedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -45,7 +67,6 @@ const User = () => {
   const handleCancelUpdate = () => {
     notification.error({
       message: 'Cancelled',
-      placement: 'topRight',
     });
     setIsModalVisible(false);
   };
@@ -53,7 +74,7 @@ const User = () => {
   const handleSubmitUpdate = async () => {
     try {
       if (newRole) {
-        await api.put(`/admin-manager/users/update-role/${currentUserId}`, { role: newRole });
+        await api.post(`/admin-manager/users/update-role/${currentUserId}?role=${newRole}`);
         notification.success({
           message: 'Success',
           description: `User role updated to ${newRole}`,
@@ -67,7 +88,6 @@ const User = () => {
         });
       }
     } catch (error) {
-      console.error('Error updating user role:', error);
       notification.error({
         message: 'Error',
         description: 'Failed to update user role.',
@@ -75,33 +95,41 @@ const User = () => {
     }
   };
 
-  const handleRemove = (user) => {
+  const handleBan = (user) => {
     setCurrentUserId(user.id);
+    setCurrStatus(user.status);
     setCurrentName(user.fullName);
     setIsPopupVisible(true);
   };
 
-  const handleConfirmRemove = async () => {
+  const handleConfirmBan = async () => {
     try {
-      await api.post(`/admin-manager/users/ban-user/${currentUserId}`, {
-        status: 'Unactive',
-      });
-      notification.success({
-        message: 'Success',
-        description: `Removed user: ${currentName} (Id: ${currentUserId})`,
-        placement: 'topRight',
-      });
-      fetchUsers(); // Fetch lại danh sách users sau khi xóa
+      if (currStatus === 'Active') {
+        await api.post(`/admin-manager/users/ban-user/${currentUserId}`, {
+          status: 'Unactive',
+        });
+        notification.success({
+          message: 'Success',
+          description: `Banned: ${currentName} (ID: ${currentUserId})`,
+        });
+      } else {
+        await api.post(`/admin-manager/users/active-user/${currentUserId}`, {
+          status: 'Active',
+        });
+        notification.success({
+          message: 'Success',
+          description: `Actived: ${currentName} (ID: ${currentUserId})`,
+        });
+      }
+      fetchUsers();
     } finally {
       setIsPopupVisible(false);
     }
   };
 
-  const handleCancelRemove = () => {
+  const handleCancelBan = () => {
     notification.error({
       message: 'Cancelled',
-      description: `Cancelled the removal of: ${currentName} (Id: ${currentUserId})`,
-      placement: 'topRight',
     });
     setIsPopupVisible(false);
   };
@@ -111,15 +139,14 @@ const User = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      align: 'center',
     },
     {
       title: 'Full Name',
       key: 'fullName',
-      render: (text, record) => (
+      render: (text) => (
         <div>
-          <b>{record.fullName}</b>
-          <div className="user-email">{record.email}</div>
+          <b>{text.fullName}</b>
+          <div>{text.email}</div>
         </div>
       ),
     },
@@ -127,33 +154,28 @@ const User = () => {
       title: 'Phone',
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
-      align: 'center',
     },
     {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
-      align: 'center',
     },
     {
       title: 'Create At',
       dataIndex: 'createAt',
       key: 'createAt',
-      align: 'center',
       render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: 'Update At',
       dataIndex: 'updateAt',
       key: 'updateAt',
-      align: 'center',
       render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: 'Role',
       dataIndex: 'role',
       key: 'role',
-      align: 'center',
       render: (role) => (
         <div
           style={{ fontWeight: role === 'Admin' ? 'bold' : 'normal', color: role === 'Admin' ? '#001529' : 'inherit' }}
@@ -166,20 +188,18 @@ const User = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      align: 'center',
       render: (status) => <div style={{ color: status === 'Active' ? 'green' : 'red' }}>{status}</div>,
     },
     {
       title: 'Action',
       key: 'action',
-      align: 'center',
-      render: (text, record) => (
+      render: (text) => (
         <div>
-          <Button onClick={() => handleUpdate(record)} type="primary" size="small">
+          <Button onClick={() => handleUpdate(text)} type="primary">
             Update
           </Button>
-          <Button onClick={() => handleRemove(record)} type="primary" size="small" danger>
-            Delete
+          <Button onClick={() => handleBan(text)} danger>
+            Ban / Active
           </Button>
         </div>
       ),
@@ -188,7 +208,6 @@ const User = () => {
 
   return (
     <div>
-      <h2>User Manager</h2>
       <Table dataSource={users} columns={columns} rowKey="id" />
       <RoleUpdate
         visible={isModalVisible}
@@ -200,10 +219,9 @@ const User = () => {
       />
       <ConfirmPopup
         open={isPopupVisible}
-        onConfirm={handleConfirmRemove}
-        onCancel={handleCancelRemove}
-        title="Please confirm"
-        content={`Are you sure you want to remove user ${currentName}?`}
+        onConfirm={handleConfirmBan}
+        onCancel={handleCancelBan}
+        content={currStatus === 'Active' ? `Ban ${currentName}?` : `Active ${currentName}?`}
       />
     </div>
   );
