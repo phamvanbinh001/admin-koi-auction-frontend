@@ -63,7 +63,7 @@ const HeaderComponent = React.memo(() => {
           <Button
             className={styles.user}
             onClick={() => {
-              navigate('/Profile');
+              navigate('/profile');
             }}
           >
             {fullName}
