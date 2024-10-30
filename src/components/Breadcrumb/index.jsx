@@ -14,6 +14,7 @@ const breadcrumbNameMap = {
   '/services/email': 'Emails',
   '/services/blog': 'Blogs',
   '/setting': 'Setting',
+  '/profile': 'Profile',
 };
 
 function BreadcrumbComponent() {

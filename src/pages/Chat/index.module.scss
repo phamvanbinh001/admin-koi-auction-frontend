@@ -19,10 +19,8 @@
   background-color: #f7f7f7;
 }
 
-.search input {
-  width: 100%;
+.search {
   padding: 10px;
-  border: 1px solid #ccc;
   border-radius: 5px;
   margin-bottom: 20px;
 }
@@ -62,6 +60,20 @@
   background-size: cover; /* Đảm bảo ảnh bao phủ toàn bộ phần tử */
   // background-position: center; /* Căn giữa ảnh */
   // background-repeat: no-repeat; /* Ngăn không cho ảnh lặp lại */
+}
+
+.scrollIcon {
+  position: absolute;
+  top: 17.5%;
+  right: 2%;
+  font-size: 25px;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--primary-color-hover);
+  }
 }
 
 .message {
