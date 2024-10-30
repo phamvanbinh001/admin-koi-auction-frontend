@@ -15,11 +15,14 @@ const Auction = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await api.get('auction/admin', {
-        requireAuth: true,
+      const response = await api.get('auction/admin?page=0&size=10', {
+        requiresAuth: true,
       });
-
-      setAuctions(response.data);
+      if (response?.data) {
+        setAuctions(response.data.auctions);
+      } else {
+        throw new Error('Failed to fetch auction data');
+      }
     } catch (error) {
       console.error('Failed to fetch auction data', error);
     } finally {
@@ -28,8 +31,8 @@ const Auction = () => {
   };
 
   useEffect(() => {
-    // fetchData(currentPage, pageSize);
-    fetchData();
+    fetchData(currentPage, pageSize);
+    // fetchData();
   }, [currentPage, pageSize]);
 
   const toUpperCase2 = (value) => {

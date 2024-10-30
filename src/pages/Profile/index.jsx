@@ -23,6 +23,7 @@ const Profile = () => {
 
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
   const [isFormModified, setIsFormModified] = useState(false);
 
   // Fetch user profile and provinces
@@ -97,6 +98,16 @@ const Profile = () => {
     }
   };
 
+  // Fetch wards when district changes
+  const fetchWards = async (districtId) => {
+    try {
+      const res = await addressApi.get(`/3/${districtId}.htm`);
+      setWards(res.data.data);
+    } catch (error) {
+      console.log('Error fetching wards:', error);
+    }
+  };
+
   const handleProvinceChange = (provinceId, option) => {
     setEditableDetails((prevState) => ({
       ...prevState,
@@ -109,8 +120,10 @@ const Profile = () => {
   const handleDistrictChange = (districtId, option) => {
     setEditableDetails((prevState) => ({
       ...prevState,
-      district: option.children, // Save district name, not ID
+      district: option.children, // Lưu tên district
+      ward: '', // Đặt lại ward khi district thay đổi
     }));
+    fetchWards(districtId); // Gọi hàm để lấy danh sách wards
   };
 
   const handleInputChange = (e) => {
@@ -265,13 +278,34 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <FormField
-                  label="Ward"
-                  name="ward"
-                  value={editableDetails.ward}
-                  onChange={handleInputChange}
-                  readOnly={false}
-                />
+                {/* Dropdown Ward */}
+                <div className={styles.rowMb3}>
+                  <div className={styles.colSm3}>
+                    <h6 className={`${styles.mb0} ${styles.largeLabel}`}>Ward</h6>
+                  </div>
+                  <div className={styles.colSm9}>
+                    <Select
+                      value={editableDetails.ward || 'default'}
+                      onChange={(value) =>
+                        setEditableDetails((prevState) => ({
+                          ...prevState,
+                          ward: value,
+                        }))
+                      }
+                      style={{ width: '100%' }}
+                      disabled={!editableDetails.district}
+                    >
+                      <Option value="default" disabled>
+                        Select your ward
+                      </Option>
+                      {wards.map((ward) => (
+                        <Option key={ward.id} value={ward.name}>
+                          {ward.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
 
                 <FormField
                   label="Specific Address"

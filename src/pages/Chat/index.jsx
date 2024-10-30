@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faAnglesDown } from '@fortawesome/free-solid-svg-icons';
+import { useLocation } from 'react-router-dom';
 import { Input, Spin, AutoComplete } from 'antd';
 import api from '../../configs/api';
+import SocketService from '../../services/socket';
 import styles from './index.module.scss';
 import useUserStore from '../../configs/useUserStore';
 
 const { TextArea } = Input;
 
 const Chat = () => {
+  const location = useLocation();
+  const id = new URLSearchParams(location.search).get('id');
+
   const [messages, setMessages] = useState([]);
-  const [currChat, setCurrChat] = useState({ receiverName: 'Vincent Porter', receiverId: messages.receiverId });
+  const [currChat, setCurrChat] = useState({ receiverName: 'Vincent Porter', receiverId: id });
   const [contacts, setContacts] = useState([]);
   const [currentPage, setCurrentPage] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -21,7 +26,6 @@ const Chat = () => {
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
   const messagesEndRef = useRef(null);
   const { user } = useUserStore();
-  const token = user.token;
 
   // Fake contacts
   useEffect(() => {
@@ -35,6 +39,22 @@ const Chat = () => {
 
     fetchData();
   }, []);
+
+  // Connect to WebSocket
+  useEffect(() => {
+    const receiveMessage = (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+      console.log('Received message:', message);
+    };
+
+    if (currChat?.receiverId && user?.token) {
+      SocketService.connect(user.token, user.userId, currChat.receiverId, receiveMessage);
+    }
+
+    return () => {
+      SocketService.disconnect();
+    };
+  }, [currChat, user]);
 
   // Tạo danh sách các tùy chọn gợi ý cho AutoComplete
   const options = contacts
@@ -50,29 +70,22 @@ const Chat = () => {
     }));
 
   const fetchOlderMessages = useCallback(async () => {
-    if (isFetching || !hasMorePages) return;
+    if (isFetching || !hasMorePages || currentPage <= 1) return;
 
     setIsFetching(true);
     setIsFetchingMessages(true); // Hiển thị Spin
 
     try {
-      const res = await fetch(
-        `https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/messages?receiverId=1&page=${
-          currentPage - 1
-        }`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json, text/plain',
-          },
+      const res = await api.get('/chat/messages', {
+        params: {
+          receiverId: 1,
+          page: currentPage - 1,
         },
-      );
+      });
 
-      const data = await res.json();
+      const data = res.data;
 
-      if (res.ok) {
+      if (res.status === 200) {
         const formattedMessages = data.content.map((message) => {
           const dateObj = new Date(message.datetime);
           return {
@@ -105,36 +118,27 @@ const Chat = () => {
       setIsFetchingMessages(true); // Hiển thị Spin khi tải tin nhắn mới nhất
 
       try {
-        const initialRes = await fetch(
-          `https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/messages?receiverId=1&page=0`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              Accept: 'application/json, text/plain',
-            },
+        const initialRes = await api.get('/chat/messages', {
+          params: {
+            receiverId: 1,
+            page: 0,
           },
-        );
+        });
 
-        const initialData = await initialRes.json();
+        const initialData = initialRes.data;
 
-        if (initialRes.ok) {
+        if (initialRes.status === 200) {
           const latestPage = initialData.totalPages - 1;
 
-          const latestMessagesRes = await fetch(
-            `https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/messages?receiverId=1&page=${latestPage}`,
-            {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                Accept: 'application/json, text/plain',
-              },
+          const latestMessagesRes = await api.get('/chat/messages', {
+            params: {
+              receiverId: 1,
+              // page: latestPage,
+              page: 0,
             },
-          );
+          });
 
-          const latestMessagesData = await latestMessagesRes.json();
+          const latestMessagesData = await latestMessagesRes.data;
 
           if (latestMessagesRes.ok) {
             const formattedMessages = latestMessagesData.content.map((message) => {
@@ -173,43 +177,34 @@ const Chat = () => {
     }
   }, [messages, shouldScrollToBottom]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
+    if (messageInput.trim() === '') return;
+
     const newMessage = {
-      receiverId: 1,
+      receiverId: currChat.receiverId,
       message: messageInput,
+      senderId: user.userId,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    try {
-      const response = await fetch(
-        'https://koi-auction-backend-dwe7hvbuhsdtgafe.southeastasia-01.azurewebsites.net/chat',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+    const sendMessage = async () => {
+      try {
+        const res = await api.post(
+          '/chat',
+          {
+            receiverId: currChat.receiverId,
+            message: messageInput,
           },
-          body: JSON.stringify(newMessage),
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-
-        const messageToDisplay = {
-          from: 'me',
-          text: messageInput,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-
-        setMessages((prevMessages) => [...prevMessages, messageToDisplay]);
-        setMessageInput('');
-        setShouldScrollToBottom(true);
-      } else {
-        console.error('Error sending message:', await response.json());
+          { requireAuth: true },
+        );
+      } catch (error) {
+        console.error('Error sending message:', error);
       }
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
+    };
+    sendMessage();
+    // setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setMessageInput('');
+    setShouldScrollToBottom(true);
   };
 
   const handleKeyPress = (e) => {
@@ -256,7 +251,6 @@ const Chat = () => {
               <img src="" className={styles.contactAvatar} alt="avt" />
               <div>
                 <h4>{contact.name}</h4>
-                <span>online 1 mins ago</span>
               </div>
             </li>
           ))}
@@ -266,7 +260,6 @@ const Chat = () => {
       <div className={styles.chatSection}>
         <div className={styles.currentChatHeader}>
           <h3>{currChat.receiverName}</h3>
-          <span style={{ color: 'green', fontWeight: 600 }}>Online</span>
         </div>
 
         {/* Hiển thị Spin khi đang tải tin nhắn */}

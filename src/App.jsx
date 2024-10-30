@@ -1,3 +1,4 @@
+import './polyfills';
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './components/GlobalStyles';
