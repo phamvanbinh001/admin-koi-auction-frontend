@@ -1,13 +1,11 @@
 import './polyfills';
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './components/GlobalStyles';
 import { publicRoutes, privateRoutes } from './routes';
 import PrivateRoute from './components/PrivateRoute';
 import DefaultLayout from './components/DefaultLayout';
 function App() {
-  const [collapsed, setCollapsed] = useState(false);
-
   return (
     <GlobalStyles>
       <BrowserRouter>
@@ -27,7 +25,8 @@ function App() {
                 path={route.path}
                 element={
                   <PrivateRoute>
-                    <DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed}>
+                    <DefaultLayout>
+                      {' '}
                       <Page />
                     </DefaultLayout>
                   </PrivateRoute>

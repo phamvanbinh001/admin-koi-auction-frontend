@@ -116,7 +116,7 @@
 }
 
 .avatar {
-  height: 30px;
+  height: 45px;
   border-radius: 50%;
 }
 
@@ -143,4 +143,9 @@
   &:hover {
     color: var(--primary-color-hover);
   }
+}
+
+.currentChatHeader {
+  display: flex;
+  align-items: center;
 }
