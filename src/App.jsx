@@ -1,5 +1,5 @@
 import './polyfills';
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './components/GlobalStyles';
 import { publicRoutes, privateRoutes } from './routes';
@@ -18,8 +18,6 @@ import AnotherLayout from './components/AnotherLayout';
 =======
 >>>>>>> d573450 (CSS for dashboard)
 function App() {
-  const [collapsed, setCollapsed] = useState(false);
-
   return (
     <GlobalStyles>
       <BrowserRouter>
@@ -39,7 +37,8 @@ function App() {
                 path={route.path}
                 element={
                   <PrivateRoute>
-                    <DefaultLayout collapsed={collapsed} setCollapsed={setCollapsed}>
+                    <DefaultLayout>
+                      {' '}
                       <Page />
                     </DefaultLayout>
                   </PrivateRoute>

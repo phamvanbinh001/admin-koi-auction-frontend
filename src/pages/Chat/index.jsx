@@ -1,50 +1,78 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faAnglesDown } from '@fortawesome/free-solid-svg-icons';
-import { useLocation } from 'react-router-dom';
-import { Input, Spin, AutoComplete } from 'antd';
+import { Input, Spin } from 'antd';
 import api from '../../configs/api';
 import SocketService from '../../services/socket';
 import styles from './index.module.scss';
 import useUserStore from '../../configs/useUserStore';
+import AutoCompleteComponent from '../../components/AutoComplete';
 
 const { TextArea } = Input;
 
 const Chat = () => {
-  const location = useLocation();
-  const id = new URLSearchParams(location.search).get('id');
-
   const [messages, setMessages] = useState([]);
-  const [currChat, setCurrChat] = useState({ receiverName: 'Vincent Porter', receiverId: id });
+  const [currChat, setCurrChat] = useState({ receiverName: null, receiverId: null });
   const [contacts, setContacts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(null);
-  const [isFetching, setIsFetching] = useState(false);
-  const [isFetchingMessages, setIsFetchingMessages] = useState(false); // State cho Spin loading
-  const [searchValue, setSearchValue] = useState(''); // Khởi tạo searchValue
-  const [hasMorePages, setHasMorePages] = useState(true);
+  const [searchValue, setSearchValue] = useState('');
   const [messageInput, setMessageInput] = useState('');
-  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+  const [isEndMessage, setIsEndMessage] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
   const messagesEndRef = useRef(null);
   const { user } = useUserStore();
+  const avtSrc = '/src/assets/avt.jpg';
 
-  // Fake contacts
+  // Fetch contacts
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchContacts = async () => {
       try {
-        const res = await fetch('http://localhost:4000/contacts');
-        const contactsData = await res.json();
-        setContacts(contactsData);
-      } catch (error) {}
+        const res = await api.get('/admin-manager/users/getAll');
+        setContacts(res.data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
     };
-
-    fetchData();
+    fetchContacts();
   }, []);
+
+  // Fetch messages
+  const fetchMessages = async (newPage) => {
+    setLoading(true);
+    try {
+      const res = await api.get('/chat/messages', {
+        params: {
+          receiverId: currChat.receiverId,
+          page: newPage,
+        },
+      });
+
+      if (newPage === res.data.totalPages) {
+        setIsEndMessage(true);
+      } else {
+        const content = res.data.content;
+        setMessages((prevMessages) => [...content, ...prevMessages]);
+        setPage(newPage);
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch first page messages when chat changes
+  useEffect(() => {
+    if (currChat.receiverId) {
+      fetchMessages(0);
+    }
+  }, [currChat]);
 
   // Connect to WebSocket
   useEffect(() => {
     const receiveMessage = (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-      console.log('Received message:', message);
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     if (currChat?.receiverId && user?.token) {
@@ -56,186 +84,44 @@ const Chat = () => {
     };
   }, [currChat, user]);
 
-  // Tạo danh sách các tùy chọn gợi ý cho AutoComplete
-  const options = contacts
-    .filter((contact) => contact.name.toLowerCase().includes(searchValue.toLowerCase()))
-    .map((contact) => ({
-      value: contact.name,
-      label: (
-        <div className={styles.contactItem}>
-          <img src="" alt="avatar" className={styles.contactAvatar} />
-          <span>{contact.name}</span>
-        </div>
-      ),
-    }));
-
-  const fetchOlderMessages = useCallback(async () => {
-    if (isFetching || !hasMorePages || currentPage <= 1) return;
-
-    setIsFetching(true);
-    setIsFetchingMessages(true); // Hiển thị Spin
-
-    try {
-      const res = await api.get('/chat/messages', {
-        params: {
-          receiverId: 1,
-          page: currentPage - 1,
-        },
-      });
-
-      const data = res.data;
-
-      if (res.status === 200) {
-        const formattedMessages = data.content.map((message) => {
-          const dateObj = new Date(message.datetime);
-          return {
-            ...message,
-            date: dateObj.toLocaleDateString('en-GB'),
-            time: dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
-          };
-        });
-
-        setMessages((prevMessages) => [...formattedMessages, ...prevMessages]);
-        setCurrentPage((prevPage) => prevPage - 1);
-
-        if (data.first) {
-          setHasMorePages(false);
-        }
-      } else {
-        console.error('Error fetching older messages:', data);
-      }
-    } catch (error) {
-      console.error('Error fetching older messages:', error);
-    } finally {
-      setIsFetching(false);
-      setIsFetchingMessages(false); // Tắt Spin
-    }
-  }, [currentPage, isFetching, hasMorePages]);
-
+  // Scroll to bottom when new messages are added
   useEffect(() => {
-    const fetchLatestMessages = async () => {
-      setIsFetching(true);
-      setIsFetchingMessages(true); // Hiển thị Spin khi tải tin nhắn mới nhất
-
-      try {
-        const initialRes = await api.get('/chat/messages', {
-          params: {
-            receiverId: 1,
-            page: 0,
-          },
-        });
-
-        const initialData = initialRes.data;
-
-        if (initialRes.status === 200) {
-          const latestPage = initialData.totalPages - 1;
-
-          const latestMessagesRes = await api.get('/chat/messages', {
-            params: {
-              receiverId: 1,
-              // page: latestPage,
-              page: 0,
-            },
-          });
-
-          const latestMessagesData = await latestMessagesRes.data;
-
-          if (latestMessagesRes.ok) {
-            const formattedMessages = latestMessagesData.content.map((message) => {
-              const dateObj = new Date(message.datetime);
-              return {
-                ...message,
-                date: dateObj.toLocaleDateString('en-GB'),
-                time: dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
-              };
-            });
-
-            setMessages(formattedMessages);
-            setCurrentPage(latestPage);
-            setHasMorePages(!latestMessagesData.first);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching latest messages:', error);
-      } finally {
-        setIsFetching(false);
-        setIsFetchingMessages(false); // Tắt Spin
-      }
-    };
-
-    fetchLatestMessages();
-  }, []);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [messages]);
 
-  useEffect(() => {
-    if (shouldScrollToBottom) {
-      scrollToBottom();
-      setShouldScrollToBottom(false);
-    }
-  }, [messages, shouldScrollToBottom]);
-
-  const handleSendMessage = () => {
+  // Send message
+  const handleSendMessage = async () => {
     if (messageInput.trim() === '') return;
 
-    const newMessage = {
-      receiverId: currChat.receiverId,
-      message: messageInput,
-      senderId: user.userId,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    const sendMessage = async () => {
-      try {
-        const res = await api.post(
-          '/chat',
-          {
-            receiverId: currChat.receiverId,
-            message: messageInput,
-          },
-          { requireAuth: true },
-        );
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
-    };
-    sendMessage();
-    // setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setMessageInput('');
-    setShouldScrollToBottom(true);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
+    try {
+      await api.post('/chat', {
+        receiverId: currChat.receiverId,
+        message: messageInput,
+      });
+      setMessageInput('');
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY === 0) {
-        fetchOlderMessages();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [fetchOlderMessages]);
+  // Load previous messages when scrolling up
+  const handleScroll = (e) => {
+    const { scrollTop } = e.target;
+    if (scrollTop === 0 && !isEndMessage) {
+      fetchMessages(page + 1); // Fetch the next page
+    }
+  };
 
   return (
     <div className={styles.chatContainer}>
       <div className={styles.contactList}>
         <div className={styles.search}>
-          <AutoComplete
-            options={options}
-            style={{ width: '100%' }}
-            placeholder="Search..."
-            onSelect={(value) => (currChat.receiverName = value)} // Xử lý khi chọn một gợi ý
-            onSearch={(value) => setSearchValue(value)} // Cập nhật giá trị tìm kiếm
-            value={searchValue}
-            onChange={(value) => setSearchValue(value)}
+          <AutoCompleteComponent
+            contacts={contacts}
+            currChat={currChat}
+            setCurrChat={setCurrChat}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
           />
         </div>
         <ul>
@@ -243,14 +129,12 @@ const Chat = () => {
             <li
               key={contact.id}
               className={styles.contactItem}
-              onClick={() => {
-                console.log(`Clicked on : ID=${contact.id}, Name=${contact.name}`);
-                setCurrChat({ receiverName: contact.name, receiverId: contact.id });
-              }}
+              onClick={() => setCurrChat({ receiverName: contact.fullName, receiverId: contact.id })}
             >
-              <img src="" className={styles.contactAvatar} alt="avt" />
+              <img src={avtSrc} className={styles.contactAvatar} alt="Avatar" />
               <div>
-                <h4>{contact.name}</h4>
+                <h4>{contact.fullName}</h4>
+                <span>{contact.role}</span>
               </div>
             </li>
           ))}
@@ -259,35 +143,35 @@ const Chat = () => {
 
       <div className={styles.chatSection}>
         <div className={styles.currentChatHeader}>
+          {currChat.receiverId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
           <h3>{currChat.receiverName}</h3>
         </div>
 
-        {/* Hiển thị Spin khi đang tải tin nhắn */}
-        {isFetchingMessages ? (
-          <Spin fullscreen />
-        ) : (
-          <ul className={styles.messageList}>
-            {messages.map((message, index) => (
-              <li
-                key={index}
-                className={`${styles.message} ${
-                  message.senderId === user.userId ? styles.myMessage : styles.otherMessage
-                }`}
-              >
-                {message.senderId !== user.userId && <img src="" alt="avt" className={styles.avatar} />}
-                <div className={styles.messageContent}>
-                  <div className={styles.messageText}>{message.message}</div>
-                  <span className={styles.messageTime}>{message.time}</span>
-                </div>
-                {message.senderId === user.userId && <img src="" alt="avt" className={styles.avatar} />}
-              </li>
-            ))}
-            <div ref={messagesEndRef} />
-            <button className={styles.scrollIcon} onClick={() => setShouldScrollToBottom(true)}>
-              <FontAwesomeIcon icon={faAnglesDown} />
-            </button>
-          </ul>
-        )}
+        <ul className={styles.messageList} onScroll={handleScroll}>
+          {loading && <Spin className={styles.loadingSpinner} />}
+          {messages.map((message, index) => (
+            <li
+              key={index}
+              className={`${styles.message} ${
+                message.senderId === user.userId ? styles.myMessage : styles.otherMessage
+              }`}
+            >
+              {message.senderId !== user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
+              <div className={styles.messageContent}>
+                <div className={styles.messageText}>{message.message}</div>
+                <span className={styles.messageTime}>{new Date(message.datetime).toLocaleTimeString()}</span>
+              </div>
+              {message.senderId === user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
+            </li>
+          ))}
+          <div ref={messagesEndRef} />
+          <button
+            className={styles.scrollIcon}
+            onClick={() => messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })}
+          >
+            <FontAwesomeIcon icon={faAnglesDown} />
+          </button>
+        </ul>
 
         <div className={styles.inputContainer}>
           <div className={styles.inputWrapper}>
@@ -295,7 +179,7 @@ const Chat = () => {
               placeholder="Enter text here..."
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
-              onKeyUp={handleKeyPress}
+              onKeyUp={(e) => e.key === 'Enter' && handleSendMessage()}
               rows={3}
               autoSize={{ minRows: 1, maxRows: 5 }}
             />
