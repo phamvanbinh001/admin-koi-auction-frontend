@@ -159,7 +159,9 @@ const Chat = () => {
               {message.senderId !== user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
               <div className={styles.messageContent}>
                 <div className={styles.messageText}>{message.message}</div>
-                <span className={styles.messageTime}>{new Date(message.datetime).toLocaleTimeString()}</span>
+                <span className={styles.messageTime}>
+                  {new Date(message.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
               </div>
               {message.senderId === user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
             </li>

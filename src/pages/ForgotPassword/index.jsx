@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Spin, ConfigProvider } from 'antd';
+import { Form, Input, Button, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import api from '../../configs/api';
 import CountDown from '../../components/Modal/CountDown';
@@ -16,7 +16,7 @@ const ForgotPassword = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [redirectPath, setRedirectPath] = useState('');
-  const [remainingTime, setRemainingTime] = useState(5);
+  const [remainingTime, setRemainingTime] = useState(59);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -38,19 +38,20 @@ const ForgotPassword = () => {
       await api.post(`forgot-password/verifyMail/${email}`);
       message.success('Mail has been sent to your email.');
       setIsTokenFieldVisible(true);
-      setRemainingTime(5);
+      setRemainingTime(59);
       setIsTokenExpired(false);
     } catch (error) {
       if (error.response?.status === 404) {
         setModalTitle('Email not found.');
         setRedirectPath('/404');
-      } else if (error.response?.status === 401) {
-        setModalTitle("You don't have permission to reset password here.");
-        setRedirectPath('/401');
-      } else {
-        setModalTitle('An unexpected error occurred.');
-        setRedirectPath('/401');
       }
+      // else if (error.response?.status === 401) {
+      //   setModalTitle("You don't have permission to reset password here.");
+      //   setRedirectPath('/401');
+      // } else {
+      //   setModalTitle('An unexpected error occurred.');
+      //   setRedirectPath('/401');
+      // }
       setIsModalVisible(true);
     } finally {
       setLoading(false);
@@ -60,7 +61,7 @@ const ForgotPassword = () => {
   const handleResendToken = async () => {
     await api.post(`forgot-password/verifyMail/${email}`);
     message.success('A new OTP has been sent.');
-    setRemainingTime(5);
+    setRemainingTime(59);
     setIsTokenExpired(false);
   };
 

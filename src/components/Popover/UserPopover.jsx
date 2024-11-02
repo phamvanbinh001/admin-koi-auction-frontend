@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Popover, Spin, Avatar, Button } from 'antd';
+import { Popover, Avatar, Button } from 'antd';
 import { StarFilled } from '@ant-design/icons';
 import api from '../../configs/api';
 import styles from './index.module.scss';
@@ -12,9 +12,7 @@ const UserPopover = ({ userId, children }) => {
     if (!userData) {
       setLoading(true);
       try {
-        const res = await api.get(`/admin-manager/users/get-user/${userId}`, {
-          // reqiureAuth: true,
-        });
+        const res = await api.get(`/admin-manager/users/get-user/${userId}`, {});
         setUserData(res.data);
       } catch (error) {
         setUserData('Failed to fetch user data');
@@ -53,13 +51,13 @@ const UserPopover = ({ userId, children }) => {
   const srcAvatar = (role) => {
     switch (role) {
       case 'Admin':
-        return 'src/assets/adminAvt.png';
+        return '/src/assets/adminAvt.png';
       case 'Staff':
-        return 'src/assets/staffAvt.png';
+        return '/src/assets/staffAvt.png';
       case 'Breeder':
-        return 'src/assets/breederAvt.png';
+        return '/src/assets/breederAvt.png';
       default:
-        return 'src/assets/defaultAvt.png';
+        return '/src/assets/avt.jpg';
     }
   };
 
@@ -97,7 +95,7 @@ const UserPopover = ({ userId, children }) => {
   return (
     <Popover content={content} title="User Details" trigger="hover" placement="right" onClick={fetchUserData}>
       <span style={{ cursor: 'pointer' }} onMouseEnter={fetchUserData}>
-        {children || <Avatar src="src/assets/defaultAvt.png" />}
+        {children || <Avatar src="/src/assets/avt.jpg" />}
       </span>
     </Popover>
   );
