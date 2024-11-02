@@ -11,26 +11,29 @@ import Blog from '../pages/Blog';
 import Transaction from '../pages/Transaction';
 import Page401 from '../pages/401';
 import Page404 from '../pages/404';
-import ForgotPassword from '../pages/ForgotPassword/ForgotPassword.jsx';
+import ForgotPassword from '../pages/ForgotPassword';
 
 const publicRoutes = [
-  { path: '/401', component: Page401 },
-  { path: '*', component: Page404 },
   { path: '/login', component: Login },
   { path: '/forgotPassword', component: ForgotPassword },
+  { path: '/401', component: Page401 },
+  { path: '*', component: Page404 },
 ];
 
 const privateRoutes = [
   { path: '/', component: Dashboard },
-  { path: '/management/user', component: User },
-  { path: '/setting', component: Setting },
-  { path: '/management/auction', component: Auction },
-  { path: '/services/chat', component: Chat },
-  { path: '/services/email', component: Email },
   { path: '/profile', component: Profile },
   { path: '/management/request', component: RequestPage },
+  { path: '/services/chat', component: Chat },
+  { path: '/services/email', component: Email },
   { path: '/services/blog', component: Blog },
-  { path: '/management/transaction', component: Transaction },
 ];
 
-export { publicRoutes, privateRoutes };
+const protectedRoutes = [
+  { path: '/management/user', component: User },
+  { path: '/management/auction', component: Auction },
+  { path: '/management/transaction', component: Transaction },
+  { path: '/setting', component: Setting },
+];
+
+export { publicRoutes, privateRoutes, protectedRoutes };

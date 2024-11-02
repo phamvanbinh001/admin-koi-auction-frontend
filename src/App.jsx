@@ -2,6 +2,7 @@ import './polyfills';
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GlobalStyles from './components/GlobalStyles';
+<<<<<<< HEAD
 import { publicRoutes, privateRoutes } from './routes';
 <<<<<<< HEAD
 
@@ -17,18 +18,23 @@ import AnotherLayout from './components/AnotherLayout';
 >>>>>>> eb748c7 (Rebuilt layout part 2)
 =======
 >>>>>>> d573450 (CSS for dashboard)
+=======
+import { publicRoutes, privateRoutes, protectedRoutes } from './routes';
+import PrivateRoute from './components/PrivateRoute';
+import DefaultLayout from './components/DefaultLayout';
+import ProtectedRoute from './components/ProtectedRoute';
+
+>>>>>>> 4d7a428 (improve performance, CSS pages, create protect route)
 function App() {
   return (
     <GlobalStyles>
       <BrowserRouter>
         <Routes>
-          {/* Không cần layout */}
           {publicRoutes.map((route) => {
             const Page = route.component;
             return <Route key={route.path} path={route.path} element={<Page />} />;
           })}
 
-          {/* Cần layout */}
           {privateRoutes.map((route) => {
             const Page = route.component;
             return (
@@ -38,10 +44,26 @@ function App() {
                 element={
                   <PrivateRoute>
                     <DefaultLayout>
-                      {' '}
                       <Page />
                     </DefaultLayout>
                   </PrivateRoute>
+                }
+              />
+            );
+          })}
+
+          {protectedRoutes.map((route) => {
+            const Page = route.component;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <ProtectedRoute>
+                    <DefaultLayout>
+                      <Page />
+                    </DefaultLayout>
+                  </ProtectedRoute>
                 }
               />
             );

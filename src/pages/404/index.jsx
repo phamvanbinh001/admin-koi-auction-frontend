@@ -6,7 +6,7 @@ const Page404 = () => {
 
   return (
     <div className={styles.container}>
-      <img src="src/assets/404.png" alt="404 Page" className={styles.image} />
+      <img src="/src/assets/404.png" alt="404 Page" className={styles.image} />
     </div>
   );
 };

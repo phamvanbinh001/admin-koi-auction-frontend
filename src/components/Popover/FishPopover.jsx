@@ -4,7 +4,7 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import api from '../../configs/api';
 import styles from './index.module.scss';
 
-const defaultImage = 'src/assets/defaultKoi.jpg';
+const defaultImage = '/src/assets/defaultKoi.jpg';
 
 const FishPopover = ({ fishIds, children }) => {
   const [fishData, setFishData] = useState(null);

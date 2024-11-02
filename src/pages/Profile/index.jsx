@@ -63,8 +63,8 @@ const Profile = () => {
           fullName: userData.fullName || '',
           userName: userData.userName || '',
           phoneNumber: userData.phoneNumber || '',
-          province, // Set province name
-          district, // Set district name
+          province,
+          district,
           ward,
           address: specificAddress,
         });
@@ -186,10 +186,9 @@ const Profile = () => {
                     className={styles.profileImage}
                   />
                   <div className={styles.profileInfo}>
-                    <FontAwesomeIcon
-                      icon={faCheckCircle}
-                      className={userDetails.role === 'Admin' ? styles.blueTick : styles.grayTick}
-                    />
+                    {userDetails.role === 'Admin' && (
+                      <FontAwesomeIcon icon={faCheckCircle} className={styles.blueTick} />
+                    )}
                     <h2 className={styles.profileName}>{userDetails.fullName}</h2>
                   </div>
                 </div>
@@ -231,7 +230,7 @@ const Profile = () => {
                   readOnly={false}
                 />
 
-                {/* Dropdown Tỉnh/Thành */}
+                {/* Dropdown Tỉnh */}
                 <div className={styles.rowMb3}>
                   <div className={styles.colSm3}>
                     <h6 className={`${styles.mb0} ${styles.largeLabel}`}>Province</h6>

@@ -32,7 +32,6 @@ const Auction = () => {
 
   useEffect(() => {
     fetchData(currentPage, pageSize);
-    // fetchData();
   }, [currentPage, pageSize]);
 
   const toUpperCase2 = (value) => {
@@ -156,12 +155,8 @@ const Auction = () => {
       staffID: auctionItem.auction.staffID || 'N/A',
       winnerID: auctionItem.auction.winnerID || 'N/A',
       auctionMethod: auctionItem.auction.auctionMethod || 'N/A',
-      startTime: auctionItem.auction.startTime
-        ? format(new Date(auctionItem.auction.startTime), 'dd/MM/yyyy HH:mm:ss')
-        : 'N/A',
-      endTime: auctionItem.auction.endTime
-        ? format(new Date(auctionItem.auction.endTime), 'dd/MM/yyyy HH:mm:ss')
-        : 'N/A',
+      startTime: auctionItem.auction.startTime ? new Date(auctionItem.auction.startTime).toLocaleString() : 'N/A',
+      endTime: auctionItem.auction.endTime ? new Date(auctionItem.auction.endTime).toLocaleString() : 'N/A',
       breederDeposit: auctionItem.auction.breederDeposit !== undefined ? auctionItem.auction.breederDeposit : 'N/A',
       bidderDeposit: auctionItem.auction.bidderDeposit !== undefined ? auctionItem.auction.bidderDeposit : 'N/A',
       startingPrice: auctionItem.auction.startingPrice !== undefined ? auctionItem.auction.startingPrice : 'N/A',
@@ -169,9 +164,7 @@ const Auction = () => {
       finalPrice: auctionItem.auction.finalPrice !== undefined ? auctionItem.auction.finalPrice : 'N/A',
       bidStep: auctionItem.auction.bidStep !== undefined ? auctionItem.auction.bidStep : 'N/A',
       auctionFee: auctionItem.auction.auctionFee !== undefined ? auctionItem.auction.auctionFee : 'N/A',
-      createAt: auctionItem.auction.createAt
-        ? format(new Date(auctionItem.auction.createAt), 'dd/MM/yyyy HH:mm:ss')
-        : 'N/A',
+      createAt: auctionItem.auction.createAt ? new Date(auctionItem.auction.createAt).toLocaleString() : 'N/A',
       status: auctionItem.auction.status || 'N/A',
     }));
 

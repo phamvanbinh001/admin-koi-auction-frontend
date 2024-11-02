@@ -54,7 +54,7 @@ const SidebarComponent = React.memo(() => {
             icon: <FontAwesomeIcon icon={faListCheck} />,
             className: styles.menuItem,
           },
-          {
+          role === 'Admin' && {
             key: '/management/auctions',
             label: <Link to="/management/auction">Auctions</Link>,
             icon: <FontAwesomeIcon icon={faFileContract} />,
@@ -100,7 +100,7 @@ const SidebarComponent = React.memo(() => {
           },
         ],
       },
-      {
+      role === 'Admin' && {
         key: '9',
         icon: <FontAwesomeIcon icon={faCogs} />,
         label: <Link to="/setting">Setting</Link>,
