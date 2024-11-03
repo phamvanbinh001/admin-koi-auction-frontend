@@ -16,18 +16,12 @@ const useUserStore = create(
       user: unAuthenticatedUser,
 
       login: (userData) => {
-        if (userData && (userData.role === 'Admin' || userData.role === 'Staff')) {
-          set({
-            user: {
-              ...userData,
-              isAuthenticated: true,
-            },
-          });
-        } else {
-          set({
-            user: unAuthenticatedUser,
-          });
-        }
+        set({
+          user: {
+            ...userData,
+            isAuthenticated: true,
+          },
+        });
       },
 
       logout: () => {

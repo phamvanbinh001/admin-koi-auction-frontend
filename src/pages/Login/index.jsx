@@ -28,26 +28,19 @@ const Login = () => {
           });
           navigate('/');
         } else {
-          throw new Error('Access denied: You do not have the required permissions.');
+          throw new Error('403');
         }
-      } else {
-        throw new Error('Token not found in response');
       }
     } catch (error) {
-      if (error.message === 'Access denied: You do not have the required permissions.') {
+      if (error.message === '403') {
         notification.error({
           message: 'Access Denied',
-          description: 'You do not have the necessary permissions to access this resource.',
+          description: 'You do not have permissions to access system.',
         });
       } else if (error.response) {
         notification.error({
           message: 'Login Failed',
-          description: error.response.data.message || 'Invalid username or password!',
-        });
-      } else {
-        notification.error({
-          message: 'Login Failed',
-          description: error.message || 'An error occurred during login!',
+          description: error.response.data,
         });
       }
     } finally {
