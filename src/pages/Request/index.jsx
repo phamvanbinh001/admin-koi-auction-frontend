@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Pagination, message } from 'antd';
-import api from '../../configs/api';
+import api from '../../configs';
 import FishPopover from '../../components/Popover/FishPopover';
 import UserPopover from '../../components/Popover/UserPopover';
 import ApproveAuction from '../../components/Modal/ApproveAuction';

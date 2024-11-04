@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import api from '../../configs/api';
+import api from '../../configs';
 import CountDown from '../../components/Modal/CountDown';
 import styles from './index.module.scss';
 import { LoadingOutlined } from '@ant-design/icons';

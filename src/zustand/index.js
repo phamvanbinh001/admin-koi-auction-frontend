@@ -10,7 +10,7 @@ const unAuthenticatedUser = {
   token: null,
 };
 
-const useUserStore = create(
+const userStore = create(
   persist(
     (set) => ({
       user: unAuthenticatedUser,
@@ -33,4 +33,10 @@ const useUserStore = create(
   ),
 );
 
-export default useUserStore;
+const themeStore = create((set) => ({
+  isDarkMode: false,
+  toggleTheme: () => set((state) => ({ isDarkMode: !state.isDarkMode }))
+}))
+
+export default userStore;
+export { themeStore };

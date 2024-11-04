@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Input, Select, notification } from 'antd';
 import styles from './index.module.scss';
-import api from '../../configs/api';
-import { addressApi } from '../../configs/api';
+import api from '../../configs';
+import { addressApi } from '../../configs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 

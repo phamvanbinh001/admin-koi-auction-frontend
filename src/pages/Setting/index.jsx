@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, notification, Spin } from 'antd';
-import api from '../../configs/api';
+import api from '../../configs';
 
 const Setting = () => {
   const [form] = Form.useForm();

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, notification } from 'antd';
-import api from '../../configs/api';
-import useUserStore from '../../configs/useUserStore';
+import api from '../../configs';
+import userStore from '../../zustand';
 import ConfirmPopup from '../../components/Popup/ConfirmPopup';
 import RoleUpdate from '../../components/Modal/RoleUpdate';
 
@@ -15,7 +15,7 @@ const User = () => {
   const [currentRole, setCurrentRole] = useState(null);
   const [newRole, setNewRole] = useState(null);
 
-  const { user } = useUserStore();
+  const { user } = userStore();
   const token = user.token;
 
   const fetchUsers = async () => {

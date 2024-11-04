@@ -1,5 +1,5 @@
 import axios from 'axios';
-import useUserStore from './useUserStore';
+import userStore from '../zustand';
 
 const baseURL = import.meta.env.VITE_API_URL;
 const addressURL = import.meta.env.VITE_ADDRESS_API_URL;
@@ -24,7 +24,7 @@ const addressApi = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const { user } = useUserStore.getState();
+    const { user } = userStore.getState();
     const token = user.token;
 
     if (token) {

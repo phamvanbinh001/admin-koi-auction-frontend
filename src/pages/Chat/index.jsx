@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faAnglesDown } from '@fortawesome/free-solid-svg-icons';
 import { Input, Spin } from 'antd';
-import api from '../../configs/api';
+import api from '../../configs';
 import SocketService from '../../services/socket';
 import styles from './index.module.scss';
-import useUserStore from '../../configs/useUserStore';
+import userStore from '../../zustand';
 import AutoCompleteComponent from '../../components/AutoComplete';
 
 const { TextArea } = Input;
@@ -20,7 +20,7 @@ const Chat = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const messagesEndRef = useRef(null);
-  const { user } = useUserStore();
+  const { user } = userStore();
   const avtSrc = '/src/assets/avt.jpg';
 
   // Fetch contacts
