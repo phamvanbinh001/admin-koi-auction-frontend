@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Tag, Button, Flex } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import UserPopover from '../../components/Popover/UserPopover';
-import api from '../../configs/api';
+import api from '../../configs';
 import * as XLSX from 'xlsx';
 import FishPopover from '../../components/Popover/FishPopover';
 

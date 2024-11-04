@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, notification } from 'antd';
-import api from '../../configs/api';
+import api from '../../configs';
 import { useNavigate } from 'react-router-dom';
-import useUserStore from '../../configs/useUserStore';
+import userStore from '../../zustand';
 import styles from './index.module.scss';
 import Logo from '../../components/Logo';
 
@@ -12,7 +12,7 @@ const Login = () => {
   console.log('Render Login');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useUserStore();
+  const { login } = userStore();
 
   const onFinish = async (values) => {
     setLoading(true);

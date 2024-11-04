@@ -3,23 +3,19 @@ import Logo from '../Logo';
 import { Layout, Switch, Dropdown, Menu, Badge, Button } from 'antd';
 import { BellFilled, GlobalOutlined } from '@ant-design/icons';
 import styles from './index.module.scss';
-import useUserStore from '../../configs/useUserStore';
+import userStore, { themeStore } from '../../zustand';
 import { useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
 
 const HeaderComponent = React.memo(() => {
   console.log('render HeaderComponent');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+
   // const [notificationCount, setNotificationCount] = useState(5);
-  const { user } = useUserStore();
+  const { user } = userStore();
   const navigate = useNavigate();
-
   const fullName = user.fullname;
-
-  const handleThemeChange = (checked) => {
-    setIsDarkMode(checked);
-  };
+  const { isDarkMode, toggleTheme } = themeStore();
 
   const languageMenu = (
     <Menu
@@ -45,7 +41,7 @@ const HeaderComponent = React.memo(() => {
         <div className={styles['header-controls']}>
           <Switch
             checked={isDarkMode}
-            onChange={handleThemeChange}
+            onChange={toggleTheme}
             checkedChildren="Dark"
             unCheckedChildren="Light"
             className={styles['dark-light-switch']}

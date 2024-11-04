@@ -17,16 +17,18 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import styles from './index.module.scss';
-import useUserStore from '../../configs/useUserStore';
+import userStore, { themeStore } from '../../zustand';
 
 const { Sider } = Layout;
 
 const SidebarComponent = React.memo(() => {
   console.log('render SidebarComponent');
-  const { logout } = useUserStore();
+
+  const isDarkMode = themeStore((state) => state.isDarkMode);
+  const { logout } = userStore();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const { user } = useUserStore();
+  const { user } = userStore();
   const role = useMemo(() => user.role, []);
 
   const handleLogout = () => {
@@ -118,7 +120,13 @@ const SidebarComponent = React.memo(() => {
   );
 
   return (
-    <Sider collapsible collapsed={collapsed} trigger={null} width={200} className={styles.sider}>
+    <Sider
+      collapsible
+      collapsed={collapsed}
+      trigger={null}
+      width={200}
+      className={`${styles.sider} ${isDarkMode ? styles.dark : styles.light}`}
+    >
       <Button
         type="text"
         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -129,12 +137,19 @@ const SidebarComponent = React.memo(() => {
         theme={{
           components: {
             Menu: {
-              itemBg: '#F5F5F5',
-              itemColor: '#D4163C',
-              itemHoverColor: '#D4163A',
-              itemSelectedBg: '#D4163C',
-              itemSelectedColor: '#fff',
-              subMenuItemBg: '#F5F5F5',
+              // itemBg: '#F5F5F5',
+              // itemColor: '#D4163C',
+              // itemHoverColor: '#D4163A',
+              // itemSelectedBg: '#D4163C',
+              // itemSelectedColor: '#fff',
+              // subMenuItemBg: '#F5F5F5',
+
+              itemBg: isDarkMode ? '#000' : '#F5F5F5',
+              itemColor: isDarkMode ? '#000' : '#D4163C',
+              itemHoverColor: isDarkMode ? '#000' : '#D4163A',
+              itemSelectedBg: isDarkMode ? '#000' : '#D4163C',
+              itemSelectedColor: '#000',
+              subMenuItemBg: isDarkMode ? '#000' : '#F5F5F5',
             },
           },
         }}

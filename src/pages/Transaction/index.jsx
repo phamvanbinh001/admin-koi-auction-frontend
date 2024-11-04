@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Spin, Button, Input, DatePicker, Space, Select, Slider } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-import api from '../../configs/api';
+import api from '../../configs';
 import * as XLSX from 'xlsx';
 
 const { RangePicker } = DatePicker;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import useUserStore from '../../configs/useUserStore';
+import userStore from '../../zustand';
 
 const ProtectedRoute = ({ children }) => {
-  const { user } = useUserStore();
+  const { user } = userStore();
   const isAuthenticated = user.isAuthenticated;
   const role = user.role;
 

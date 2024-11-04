@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Popover, List, Spin, Button } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import api from '../../configs/api';
+import api from '../../configs';
 import styles from './index.module.scss';
 
 const defaultImage = '/src/assets/defaultKoi.jpg';
