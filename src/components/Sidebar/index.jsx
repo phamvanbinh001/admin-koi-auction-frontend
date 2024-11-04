@@ -137,13 +137,6 @@ const SidebarComponent = React.memo(() => {
         theme={{
           components: {
             Menu: {
-              // itemBg: '#F5F5F5',
-              // itemColor: '#D4163C',
-              // itemHoverColor: '#D4163A',
-              // itemSelectedBg: '#D4163C',
-              // itemSelectedColor: '#fff',
-              // subMenuItemBg: '#F5F5F5',
-
               itemBg: isDarkMode ? '#000' : '#F5F5F5',
               itemColor: isDarkMode ? '#000' : '#D4163C',
               itemHoverColor: isDarkMode ? '#000' : '#D4163A',
