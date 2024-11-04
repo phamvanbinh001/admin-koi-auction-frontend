@@ -56,16 +56,16 @@
   flex: 1;
   overflow-y: auto;
 
-  background-image: url('../../assets/msg-bgr.jpg');
-  background-size: cover; /* Đảm bảo ảnh bao phủ toàn bộ phần tử */
-  // background-position: center; /* Căn giữa ảnh */
-  // background-repeat: no-repeat; /* Ngăn không cho ảnh lặp lại */
+  background-image: url('../../assets/a.png');
+  background-size: cover;
+  background-position: center;
 }
 
 .scrollIcon {
-  position: absolute;
-  top: 17.5%;
-  right: 2%;
+  // position: absolute;
+  // top: 17.5%;
+  // right: 2%;
+  margin-left: 87%;
   font-size: 25px;
   color: var(--primary-color);
   cursor: pointer;

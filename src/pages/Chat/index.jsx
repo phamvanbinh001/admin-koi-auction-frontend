@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faAnglesDown } from '@fortawesome/free-solid-svg-icons';
-import { Input, Spin } from 'antd';
+import { Input, Spin, Divider } from 'antd';
 import api from '../../configs';
 import SocketService from '../../services/socket';
 import styles from './index.module.scss';
@@ -23,6 +23,8 @@ const Chat = () => {
   const { user } = userStore();
   const avtSrc = '/src/assets/avt.jpg';
 
+  const [isNewMessage, setIsNewMessage] = useState(false);
+
   // Fetch contacts
   useEffect(() => {
     const fetchContacts = async () => {
@@ -36,6 +38,38 @@ const Chat = () => {
     fetchContacts();
   }, []);
 
+  // theo dõi receiverId
+  useEffect(() => {
+    if (currChat.receiverId) {
+      setMessages([]);
+      setIsEndMessage(false);
+    }
+  }, [currChat.receiverId]);
+
+  // Fetch last page when the chat changes
+  useEffect(() => {
+    const fetchLastPage = async () => {
+      if (currChat.receiverId) {
+        try {
+          const res = await api.get('/chat/messages', {
+            params: {
+              receiverId: currChat.receiverId,
+              page: 0,
+            },
+          });
+
+          const totalPage = res.data.totalPages;
+
+          fetchMessages(totalPage - 1);
+        } catch (error) {
+          console.error('Error fetching total pages:', error);
+        }
+      }
+    };
+
+    fetchLastPage();
+  }, [currChat]);
+
   // Fetch messages
   const fetchMessages = async (newPage) => {
     setLoading(true);
@@ -47,13 +81,15 @@ const Chat = () => {
         },
       });
 
-      if (newPage === res.data.totalPages) {
+      const totalPage = res.data.totalPages;
+      const content = res.data.content;
+
+      if (newPage === totalPage) {
         setIsEndMessage(true);
-      } else {
-        const content = res.data.content;
-        setMessages((prevMessages) => [...content, ...prevMessages]);
-        setPage(newPage);
       }
+
+      setMessages((prevMessages) => [...content, ...prevMessages]);
+      setPage(newPage);
     } catch (error) {
       console.error('Error fetching messages:', error);
     } finally {
@@ -61,18 +97,11 @@ const Chat = () => {
     }
   };
 
-  // Fetch first page messages when chat changes
-  useEffect(() => {
-    if (currChat.receiverId) {
-      fetchMessages(0);
-    }
-  }, [currChat]);
-
   // Connect to WebSocket
   useEffect(() => {
     const receiveMessage = (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setIsNewMessage(true);
     };
 
     if (currChat?.receiverId && user?.token) {
@@ -86,8 +115,11 @@ const Chat = () => {
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (isNewMessage) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setIsNewMessage(false); // Reset the flag after scrolling
+    }
+  }, [isNewMessage]);
 
   // Send message
   const handleSendMessage = async () => {
@@ -108,8 +140,16 @@ const Chat = () => {
   const handleScroll = (e) => {
     const { scrollTop } = e.target;
     if (scrollTop === 0 && !isEndMessage) {
-      fetchMessages(page + 1); // Fetch the next page
+      fetchMessages(page - 1);
     }
+  };
+
+  // Check date to display date divider
+  const isDifferentDay = (currentMessage, previousMessage) => {
+    if (!previousMessage) return true;
+    const currentDate = new Date(currentMessage.datetime).toDateString();
+    const previousDate = new Date(previousMessage.datetime).toDateString();
+    return currentDate !== previousDate;
   };
 
   return (
@@ -144,35 +184,52 @@ const Chat = () => {
       <div className={styles.chatSection}>
         <div className={styles.currentChatHeader}>
           {currChat.receiverId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
-          <h3>{currChat.receiverName}</h3>
-        </div>
-
-        <ul className={styles.messageList} onScroll={handleScroll}>
-          {loading && <Spin className={styles.loadingSpinner} />}
-          {messages.map((message, index) => (
-            <li
-              key={index}
-              className={`${styles.message} ${
-                message.senderId === user.userId ? styles.myMessage : styles.otherMessage
-              }`}
-            >
-              {message.senderId !== user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
-              <div className={styles.messageContent}>
-                <div className={styles.messageText}>{message.message}</div>
-                <span className={styles.messageTime}>
-                  {new Date(message.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-              {message.senderId === user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
-            </li>
-          ))}
-          <div ref={messagesEndRef} />
+          <h3 className={styles.receiverName}>{currChat.receiverName}</h3>
           <button
             className={styles.scrollIcon}
             onClick={() => messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })}
           >
             <FontAwesomeIcon icon={faAnglesDown} />
           </button>
+        </div>
+
+        <ul className={styles.messageList} onScroll={handleScroll}>
+          {loading && <Spin className={styles.loadingSpinner} />}
+          {messages.map((message, index) => (
+            <React.Fragment key={index}>
+              {isDifferentDay(message, messages[index - 1]) && (
+                <Divider className={styles.dateDivider}>
+                  {new Date(message.datetime).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </Divider>
+              )}
+              <li
+                key={index}
+                className={`${styles.message} ${
+                  message.senderId === user.userId ? styles.myMessage : styles.otherMessage
+                }`}
+              >
+                {message.senderId !== user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
+                <div className={styles.messageContent}>
+                  <div className={styles.messageText}>{message.message}</div>
+                  <span className={styles.messageTime}>
+                    {new Date(message.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+                {message.senderId === user.userId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
+              </li>
+            </React.Fragment>
+          ))}
+          <div ref={messagesEndRef} />
+          {/* <button
+            className={styles.scrollIcon}
+            onClick={() => messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })}
+          >
+            <FontAwesomeIcon icon={faAnglesDown} />
+          </button> */}
         </ul>
 
         <div className={styles.inputContainer}>
