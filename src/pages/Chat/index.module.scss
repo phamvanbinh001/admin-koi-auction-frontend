@@ -38,17 +38,42 @@
   }
 }
 
+// .contactAvatar {
+//   width: 40px;
+//   height: 40px;
+//   border-radius: 50%;
+//   margin-right: 10px;
+// }
+
 .contactAvatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
+  flex: 2;
+  width: 100%;
+  max-width: 50px;
+}
+
+.receiverName {
+  flex: 4;
+  margin-left: 10px;
 }
 
 .currentChatHeader {
   padding: 15px;
   background-color: #fff;
   border-bottom: 1px solid #ccc;
+}
+
+.scrollIcon {
+  flex: 0.1;
+  font-size: 25px;
+  transition: color 0.3s ease;
+  color: var(--primary-color);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+
+  &:hover {
+    color: var(--primary-color-hover);
+  }
 }
 
 .messageList {
@@ -59,21 +84,6 @@
   background-image: url('../../assets/a.png');
   background-size: cover;
   background-position: center;
-}
-
-.scrollIcon {
-  // position: absolute;
-  // top: 17.5%;
-  // right: 2%;
-  margin-left: 87%;
-  font-size: 25px;
-  color: var(--primary-color);
-  cursor: pointer;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: var(--primary-color-hover);
-  }
 }
 
 .message {

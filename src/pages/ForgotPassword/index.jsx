@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Spin } from 'antd';
+import { Form, Input, Button, message, Spin, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import api from '../../configs';
-import CountDown from '../../components/Modal/CountDown';
 import styles from './index.module.scss';
 import { LoadingOutlined } from '@ant-design/icons';
 import Logo from '../../components/Logo';
@@ -11,11 +10,9 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [isTokenFieldVisible, setIsTokenFieldVisible] = useState(false);
   const [isTokenExpired, setIsTokenExpired] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
-  const [redirectPath, setRedirectPath] = useState('');
   const [remainingTime, setRemainingTime] = useState(59);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -35,24 +32,33 @@ const ForgotPassword = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await api.post(`forgot-password/verifyMail/${email}`);
-      message.success('Mail has been sent to your email.');
-      setIsTokenFieldVisible(true);
-      setRemainingTime(59);
-      setIsTokenExpired(false);
-    } catch (error) {
-      if (error.response?.status === 404) {
-        setModalTitle('Email not found.');
-        setRedirectPath('/404');
+      if (otp) {
+        console.log('fetch reset password api');
+
+        await api.post('/forgot-password/verifyAndChangePassword', {
+          otp,
+          email,
+          changePassword: {
+            password,
+            repeatPassword: confirmPassword,
+          },
+        });
+        message.success('Password changed successfully.');
+        navigate('/login');
+      } else {
+        console.log('fetch verify mail api');
+
+        await api.post(`forgot-password/verifyMail/${email}`);
+        message.success('Mail has been sent to your email.');
+        setIsTokenFieldVisible(true);
+        setRemainingTime(59);
+        setIsTokenExpired(false);
       }
-      // else if (error.response?.status === 401) {
-      //   setModalTitle("You don't have permission to reset password here.");
-      //   setRedirectPath('/401');
-      // } else {
-      //   setModalTitle('An unexpected error occurred.');
-      //   setRedirectPath('/401');
-      // }
-      setIsModalVisible(true);
+    } catch (error) {
+      notification.error({
+        message: 'Error: ' + (error.response?.status || 'Unknown'),
+        description: error.response?.data?.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -63,11 +69,6 @@ const ForgotPassword = () => {
     message.success('A new OTP has been sent.');
     setRemainingTime(59);
     setIsTokenExpired(false);
-  };
-
-  const handleCloseModal = (path) => {
-    setIsModalVisible(false);
-    navigate(path);
   };
 
   return (
@@ -101,9 +102,9 @@ const ForgotPassword = () => {
         {isTokenFieldVisible && (
           <>
             <Form.Item label="OTP" name="token" rules={[{ required: true }]}>
-              <Input disabled={isTokenExpired} />
+              <Input value={otp} onChange={(e) => setOtp(e.target.value)} disabled={isTokenExpired} />
             </Form.Item>
-            <Form.Item label="OTP will expires in">
+            <Form.Item label="OTP will expire in">
               <Input
                 value={isTokenExpired ? 'Expired' : `${remainingTime}`}
                 readOnly
@@ -119,9 +120,6 @@ const ForgotPassword = () => {
             </Button>
           )}
         </div>
-        {isModalVisible && (
-          <CountDown title={modalTitle} initialTime={5} onClose={handleCloseModal} redirectPath={redirectPath} />
-        )}
         <Button onClick={() => navigate('/login')} className={styles.loginBtn}>
           Back to Login
         </Button>

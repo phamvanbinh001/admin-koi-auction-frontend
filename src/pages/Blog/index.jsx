@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { Layout, Menu, List, Avatar, Button, Pagination, Input } from 'antd';
-import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import './blog.css';
-
-const { Header, Sider, Content } = Layout;
+import React, { useState, useEffect } from 'react';
+import { List, Avatar, Pagination, Input, Carousel } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import api from '../../configs';
+import styles from './index.module.scss';
+import PostModal from '../../components/Modal/PostModal';
+import userStore from '../../zustand';
+import UserPopover from '../../components/Popover/UserPopover';
 
 const initialPosts = [
   {
     id: 1,
+    userId: 1,
     author: 'John Doe',
     title: 'Understanding React Hooks',
     content:
@@ -16,6 +19,7 @@ const initialPosts = [
   },
   {
     id: 2,
+    userId: 1,
     author: 'Jane Smith',
     title: 'A Guide to CSS Grid',
     content:
@@ -24,6 +28,7 @@ const initialPosts = [
   },
   {
     id: 3,
+    userId: 1,
     author: 'Alice Johnson',
     title: 'JavaScript ES6 Features',
     content:
@@ -32,6 +37,7 @@ const initialPosts = [
   },
   {
     id: 4,
+    userId: 1,
     author: 'Bob Brown',
     title: 'Building a RESTful API with Node.js',
     content:
@@ -41,11 +47,35 @@ const initialPosts = [
 ];
 
 const Blog = () => {
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [text, setText] = useState('');
+  const [images, setImages] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [posts, setPosts] = useState(initialPosts);
-  const [newPost, setNewPost] = useState({ title: '', content: '', author: '' });
-  const pageSize = 5;
+  // const [posts, setPosts] = useState([]);
+  const pageSize = 2;
+  const { user } = userStore();
+
+  const fetchBlogs = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('blogs');
+      if (res?.data) {
+        setPosts(res.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch blog posts', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch blog posts
+  // useEffect(() => {
+  //   fetchBlogs();
+  // }, []);
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -56,104 +86,99 @@ const Blog = () => {
     setSelectedPost(null);
   };
 
+  const handlePostSubmit = () => {
+    if (text || images.length) {
+      const newPost = {
+        userId: user.userId,
+        content: text,
+        images: images.map((file) => ({
+          url: URL.createObjectURL(file.originFileObj),
+        })),
+      };
+      setPosts([newPost, ...posts]);
+      setText('');
+      setImages([]);
+      setIsModalVisible(false);
+    }
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+  };
+
   const currentPosts = posts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const renderPostList = () => (
     <div>
       <List
-        itemLayout="horizontal"
         dataSource={currentPosts}
         renderItem={(item) => (
           <List.Item onClick={() => handlePostClick(item)} style={{ cursor: 'pointer' }}>
             <List.Item.Meta
               avatar={<Avatar icon={<UserOutlined />} />}
               title={<span className="post-title">{item.title}</span>}
-              description={<span className="post-author">{item.author}</span>}
+              description={<span>{item.author}</span>}
             />
-            <div className="post-time">{item.time}</div>
+            <div>{item.time}</div>
           </List.Item>
         )}
       />
-      <Pagination
-        current={currentPage}
-        pageSize={pageSize}
-        total={posts.length}
-        onChange={handlePageChange}
-        style={{ marginTop: '20px', textAlign: 'center' }}
+      <Pagination current={currentPage} pageSize={pageSize} total={posts.length} onChange={handlePageChange} />
+    </div>
+  );
+
+  const renderPostDetails = (selectedPost) => (
+    <>
+      <UserPopover userId={selectedPost.userId}>
+        <Avatar size={'large'} className={styles.avtPopover} />
+        <b className={styles.name}>Nguyen Van A</b>
+      </UserPopover>
+
+      <div className={styles.content}>
+        <p className={styles.text}>
+          {selectedPost.content.length > 100 ? `${selectedPost.content.substring(0, 100)}...` : selectedPost.content}
+        </p>
+        <Carousel>
+          {selectedPost.images.map((img, idx) => (
+            <img key={idx} src={img.url} alt={`Post ${idx}`} className={styles.image} />
+          ))}
+        </Carousel>
+      </div>
+    </>
+  );
+
+  const renderInput = () => (
+    <>
+      <div className={styles.input}>
+        <Input placeholder="Post anything . . ." onClick={showModal} readOnly />
+      </div>
+
+      <PostModal
+        visible={isModalVisible}
+        onClose={handleModalClose}
+        onSubmit={handlePostSubmit}
+        text={text}
+        setText={setText}
+        images={images}
+        setImages={setImages}
       />
-    </div>
+    </>
   );
-
-  const renderPostDetails = () => (
-    <div className="post-details">
-      <h3 className="post-title">{selectedPost.title}</h3>
-      <p>
-        <strong>Author:</strong> {selectedPost.author}
-      </p>
-      <p>
-        <strong>Time:</strong> {selectedPost.time}
-      </p>
-      <p>{selectedPost.content}</p>
-      <Button type="primary" onClick={() => setSelectedPost(null)}>
-        Back to Blog
-      </Button>
-    </div>
-  );
-
-  const handleAddPost = () => {
-    const newPostData = { ...newPost, id: posts.length + 1, time: new Date().toISOString().split('T')[0] };
-    setPosts([...posts, newPostData]);
-    setNewPost({ title: '', content: '', author: '' }); // Reset form
-  };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={250} style={{ backgroundColor: '#f1f3f4' }}>
-        <Menu mode="inline" defaultSelectedKeys={['1']} style={{ height: '100%' }}>
-          <Menu.Item key="1" icon={<EditOutlined />}>
-            Blog
-          </Menu.Item>
-          <Menu.Item key="2" icon={<DeleteOutlined />}>
-            Trash
-          </Menu.Item>
-        </Menu>
-      </Sider>
-      <Layout>
-        <Content style={{ padding: '24px', backgroundColor: '#ffffff' }}>
-          {selectedPost ? (
-            renderPostDetails()
-          ) : (
-            <>
-              <h2>Add New Post</h2>
-              <Input
-                placeholder="Title"
-                value={newPost.title}
-                onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                style={{ marginBottom: '10px' }}
-              />
-              <Input
-                placeholder="Author"
-                value={newPost.author}
-                onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
-                style={{ marginBottom: '10px' }}
-              />
-              <Input.TextArea
-                placeholder="Content"
-                value={newPost.content}
-                onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                rows={4}
-                style={{ marginBottom: '10px' }}
-              />
-              <Button type="primary" onClick={handleAddPost}>
-                Add Post
-              </Button>
-              <h2 style={{ marginTop: '20px' }}>Blog Posts</h2>
-              {renderPostList()}
-            </>
-          )}
-        </Content>
-      </Layout>
-    </Layout>
+    <div style={{ padding: '24px' }}>
+      {/* input */}
+      {renderInput()}
+
+      {/* content */}
+      {selectedPost ? renderPostDetails() : renderPostList()}
+
+      {/* pagination */}
+    </div>
   );
 };
 

@@ -5,7 +5,6 @@ import { Form, Button, Input, Card, Statistic, ConfigProvider } from 'antd';
 import { UsergroupAddOutlined, DollarOutlined, ShoppingCartOutlined, LinuxOutlined } from '@ant-design/icons';
 import api from '../../configs';
 import styles from './index.module.scss';
-import { themeStore } from '../../zustand';
 
 Chart.register(...registerables);
 
@@ -29,8 +28,6 @@ const LineChart = React.memo(({ data }) => (
 ));
 
 const Dashboard = () => {
-  const { isDarkMode } = themeStore();
-
   const [summaryData, setSummaryData] = useState(null);
 
   const currDate = new Date();
@@ -94,8 +91,7 @@ const Dashboard = () => {
   };
 
   return (
-    // <div className={styles.dashboard}>
-    <div className={isDarkMode ? styles.dark : styles.light}>
+    <div className={styles.dashboard}>
       <Form layout="inline" className={styles.filterForm} onFinish={onFinish} initialValues={dateFilters}>
         <Form.Item name="day" label="Day">
           <Input type="number" min={1} max={31} />

@@ -184,7 +184,9 @@ const Chat = () => {
       <div className={styles.chatSection}>
         <div className={styles.currentChatHeader}>
           {currChat.receiverId && <img src={avtSrc} className={styles.avatar} alt="Avatar" />}
+
           <h3 className={styles.receiverName}>{currChat.receiverName}</h3>
+
           <button
             className={styles.scrollIcon}
             onClick={() => messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })}
