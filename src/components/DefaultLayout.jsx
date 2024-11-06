@@ -4,7 +4,6 @@ import HeaderComponent from './Header';
 import SidebarComponent from './Sidebar';
 import BreadcrumbComponent from './Breadcrumb';
 import ContentComponent from './Content';
-import styles from './index.module.scss';
 import { themeStore } from '../zustand';
 
 const DefaultLayout = ({ children }) => {
@@ -13,7 +12,7 @@ const DefaultLayout = ({ children }) => {
   const isDarkMode = themeStore((state) => state.isDarkMode);
 
   return (
-    <Layout style={{ minHeight: '100vh' }} className={isDarkMode ? styles.dark : styles.light}>
+    <Layout style={{ minHeight: '100vh' }}>
       <HeaderComponent />
       <Layout>
         <SidebarComponent />

@@ -157,8 +157,19 @@ const User = () => {
     },
     {
       title: 'Address',
-      dataIndex: 'address',
       key: 'address',
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: 'nowrap', // Giữ text trên cùng 1 dòng
+            overflow: 'hidden', // Ẩn phần text dư thừa
+            textOverflow: 'ellipsis', // Hiển thị dấu chấm 3 chấm khi text bị ẩn
+            maxWidth: '450px',
+          }}
+        >
+          {text.address}
+        </div>
+      ),
     },
     {
       title: 'Create At',

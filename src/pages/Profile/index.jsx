@@ -197,7 +197,6 @@ const Profile = () => {
             <div className={styles.readOnlySection}>
               <FormField label="Role" value={userDetails.role} readOnly={true} />
               <FormField label="Email" value={userDetails.email} readOnly={true} />
-              <FormField label="Password" value={userDetails.password} readOnly={true} />
               <FormField
                 label="Created At"
                 value={userDetails.createAt ? new Date(userDetails.createAt).toLocaleString() : 'N/A'}

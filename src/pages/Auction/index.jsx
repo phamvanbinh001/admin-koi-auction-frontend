@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, Button, Flex } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Tag, Table, Button, Pagination, Flex } from 'antd';
+import FishPopover from '../../components/Popover/FishPopover';
 import UserPopover from '../../components/Popover/UserPopover';
+import { DownloadOutlined } from '@ant-design/icons';
 import api from '../../configs';
 import * as XLSX from 'xlsx';
-import FishPopover from '../../components/Popover/FishPopover';
 
 const Auction = () => {
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchData = async () => {
+  const fetchData = async (page) => {
     setLoading(true);
     try {
-      const response = await api.get('auction/admin?page=0&size=10', {
-        requiresAuth: true,
+      const response = await api.get('/auction/admin', {
+        params: {
+          page,
+          size: 9,
+        },
       });
+
+      console.log('fetch page: ', page + 1);
+
       if (response?.data) {
         setAuctions(response.data.auctions);
-      } else {
-        throw new Error('Failed to fetch auction data');
+        setTotalPages(response.data.totalPages);
       }
     } catch (error) {
       console.error('Failed to fetch auction data', error);
@@ -31,8 +36,12 @@ const Auction = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage, pageSize);
-  }, [currentPage, pageSize]);
+    fetchData(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page - 1);
+  };
 
   const toUpperCase2 = (value) => {
     return value ? value.toUpperCase() : 'N/A';
@@ -42,7 +51,6 @@ const Auction = () => {
     {
       title: 'ID',
       dataIndex: ['auction', 'id'],
-      // key: 'id',
     },
     {
       title: 'Fish Details',
@@ -78,7 +86,6 @@ const Auction = () => {
     {
       title: 'Method',
       dataIndex: ['auction', 'auctionMethod'],
-      // key: 'auctionMethod',
     },
     {
       title: 'Start Price',
@@ -88,12 +95,10 @@ const Auction = () => {
     {
       title: 'Bid Step',
       dataIndex: ['auction', 'bidStep'],
-      // key: 'bidStep',
     },
     {
       title: 'Buyout Price',
       dataIndex: ['auction', 'buyoutPrice'],
-      // key: 'buyoutPrice',
     },
     {
       title: 'Final Price',
@@ -113,13 +118,12 @@ const Auction = () => {
     {
       title: 'Approved By',
       dataIndex: ['auction', 'staffID'],
-      // key: 'staffID',
       render: (text) => <UserPopover userId={text} />,
     },
     {
       title: 'Status',
       dataIndex: ['auction', 'status'],
-      // key: 'status',
+      key: 'status',
       render: (status) => {
         let color;
         switch (status) {
@@ -176,9 +180,9 @@ const Auction = () => {
 
   return (
     <>
-      <Flex gap="small" align="flex-end" vertical onClick={exportToExcel} style={{ marginBottom: '20px' }}>
-        <Flex gap="small" wrap>
-          <Button type="primary" icon={<DownloadOutlined />} size={'middle'}>
+      <Flex align="flex-end" vertical style={{ marginBottom: '20px' }}>
+        <Flex>
+          <Button onClick={exportToExcel} type="primary" icon={<DownloadOutlined />}>
             Export to Excel
           </Button>
         </Flex>
@@ -188,16 +192,13 @@ const Auction = () => {
         columns={columns}
         dataSource={auctions}
         loading={loading}
-        pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          onChange: (page, size) => {
-            setCurrentPage(page);
-            setPageSize(size);
-          },
-        }}
         rowKey={(record) => record.auction.id}
+        pagination={false}
       />
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+        <Pagination current={currentPage + 1} total={totalPages * 9} pageSize={9} onChange={handlePageChange} />
+      </div>
     </>
   );
 };
