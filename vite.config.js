@@ -5,12 +5,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   envPrefix: 'VITE_',
-<<<<<<< HEAD
   server: {
     host: '0.0.0.0',
     historyApiFallback: true,
   },
-});
-=======
 })
->>>>>>> d9fc573 (Get Auction Feature before using tooltip)
